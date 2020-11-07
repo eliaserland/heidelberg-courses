@@ -48,7 +48,7 @@ int main(int argc, char const *argv[])
         em_long_double_last = em_long_double;
         em_long_double = em_long_double * 0.5;
     }
-    
+
     printf("Machine epsilon for long double is: \n%80.50Le\n", em_long_double_last);
     printf("1 + e_m evaulates to: \n%80.70Le\n\n\n", 1 + em_long_double_last);  
 
