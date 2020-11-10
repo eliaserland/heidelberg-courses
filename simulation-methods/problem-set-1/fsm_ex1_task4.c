@@ -6,9 +6,18 @@
 
 
 double f(double x) {
+        double out;
+        double threshold = 0.01;
+
         // If x closer to 0 than threshold, do
-       
-        return (x+exp(-x)-1)/(x*x);
+        
+        if (fabs(x) < threshold) {
+                // out = (taylor exp. around 0)
+                out = 0.5;
+        } else {
+                out = (x+exp(-x)-1)/(x*x);
+        } 
+        return out;
 }
 
 int main(int argc, char const *argv[])
