@@ -6,7 +6,7 @@
 
 /*
  * Fundamentals of Simulation Methods, Problem Set 1, Exercise 4.
- * 
+ * Near-cancellation of floating point numbers.
  * 
  * Author: Elias Olofsson (ub253@stud.uni-heidelberg.de)
  * 
@@ -19,10 +19,11 @@
  *      certain threshold to x=0, a third order taylor expansion around x=0 is 
  *      used, instead of the analytical expression for f.
  */
-double f(double x) {
+double f(double x) 
+{
         double out;
         double threshold = 0.001;
-        if (fabs(x) < threshold) {
+        if (0){         //(fabs(x) < threshold) {
                 out = 0.5 - x/6.0 + x*x/24.0 - x*x*x/120.0;
         } else {
                 out = (x+exp(-x)-1)/(x*x);

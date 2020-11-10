@@ -8,7 +8,7 @@
  * Author: Elias Olofsson (ub253@stud.uni-heidelberg.de)
  * 
  * Version information: 
- *      2020-11-07: v.1.0. First public release.
+ *      2020-11-10: v.1.0. First public release.
  */
 
 int main(int argc, char const *argv[])
@@ -54,12 +54,3 @@ int main(int argc, char const *argv[])
 
     return 0;
 }
-
-
-
-
-
-
-
-
-
