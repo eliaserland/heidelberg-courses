@@ -4,16 +4,26 @@
 #include <string.h>
 #include <math.h>
 
+/*
+ * Fundamentals of Simulation Methods, Problem Set 1, Exercise 4.
+ * 
+ * 
+ * Author: Elias Olofsson (ub253@stud.uni-heidelberg.de)
+ * 
+ * Version information: 
+ *      2020-11-10: v.1.0. First public release.
+ */
 
+/*
+ * f:   Analytical function f(x) = (x+exp(-1)+1)/x^2. For values x closer than a 
+ *      certain threshold to x=0, a third order taylor expansion around x=0 is 
+ *      used, instead of the analytical expression for f.
+ */
 double f(double x) {
         double out;
-        double threshold = 0.01;
-
-        // If x closer to 0 than threshold, do
-        
+        double threshold = 0.001;
         if (fabs(x) < threshold) {
-                // out = (taylor exp. around 0)
-                out = 0.5;
+                out = 0.5 - x/6.0 + x*x/24.0 - x*x*x/120.0;
         } else {
                 out = (x+exp(-x)-1)/(x*x);
         } 
@@ -22,7 +32,7 @@ double f(double x) {
 
 int main(int argc, char const *argv[])
 {
-        // Allocations
+        // Allocations.
         char *str = malloc(255);
         double x;
         double fval; 
@@ -41,12 +51,12 @@ int main(int argc, char const *argv[])
                         // Store input to variable x and calc f(x).
                         x = strtod(str, NULL);
                         fval = f(x);
-                        // Print result
+                        // Print result.
                         printf("f(x) = %g\n\n", fval);
                 }
         }
 
-        // Free dynamically allocated memory
+        // Free dynamically allocated memory.
         free(str);
 
         return 0;
