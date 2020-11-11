@@ -23,7 +23,7 @@ double f(double x)
 {
         double out;
         double threshold = 0.001;
-        if (0){         //(fabs(x) < threshold) {
+        if (fabs(x) < threshold) {
                 out = 0.5 - x/6.0 + x*x/24.0 - x*x*x/120.0;
         } else {
                 out = (x+exp(-x)-1)/(x*x);
