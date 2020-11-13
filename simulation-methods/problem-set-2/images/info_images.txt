@@ -1,0 +1,1 @@
+scatter_randu.png : n = 10^9, d = 2. Area [0.2,0.201] x [0.3, 0.301]
