@@ -1,0 +1,50 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐                                 
+│                                     Feedback to Exercise 01a                                     │                                 
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘                                 
+              Handed in as: Casavecchia-Benedetta_Olofsson-Elias_Toni-Greta_ex01a.zip                                                
+                                                                                                                                     
+                            Great, thanks for naming the file correctly.                                                             
+                                                                                                                                     
+                      This feedback is for:                                                                                          
+                      • Benedetta  Casavecchia (or253@stud.uni-heidelberg.de)                                                        
+                      • Elias Olofsson (ub253@stud.uni-heidelberg.de)                                                                
+                      • Greta Toni (wd253@stud.uni-heidelberg.de)                                                                    
+                                                 
+                                                                                   
+                      E 1 (7.0) │ E 2 (5.0) │ E 3 (2.0) │ E 4 (6.0) │ ∑ (20.0)                                                       
+                      ──────────┼───────────┼───────────┼───────────┼─────────                                                       
+                         8.0    │    5.0    │    2.0    │    4.0    │   19.0                                                         
+                                                 
+                                                                                   
+Exercise  1                                                                              [8.0 / 7.0]                                 
+────────────────────────────────────────────────────────────────────────────────────────────────────                                 
+Perfect! [@+1] for reusable code.                                                                                                    
+                                                                                                                                     
+                                                                                                                                     
+Exercise  2                                                                              [5.0 / 5.0]                                 
+────────────────────────────────────────────────────────────────────────────────────────────────────                                 
+Great!                                                                                                                               
+                                                                                                                                     
+Good suggestion that we should actually answer the question instead of showing the result. We corrected our solution for next year :)
+                                                                                                                                     
+                                                                                                                                     
+                                                                                                                                     
+Exercise  3                                                                              [2.0 / 2.0]                                 
+────────────────────────────────────────────────────────────────────────────────────────────────────                                 
+Good.                                                                                                                                
+                                                                                                                                     
+                                                                                                                                     
+Exercise  4                                                                              [4.0 / 6.0]                                 
+────────────────────────────────────────────────────────────────────────────────────────────────────                                 
+[@-1] You failed to actually vary the training set size.                                                                             
+[@-1] You did not notice.                                                                                                            
+                                                                                                                                     
+Implementation looks good otherwise.                                                                                                 
+                                                                                                                                     
+                                                                                                                                     
+
+                                                                                                                                    
+════════════════════════════════════════════════════════════════════════════════════════════════════                                 
+This feedback was created by Felix (Felix Draxler).                                                                                  
+Please ask questions about the feedback to (felix.draxler@iwr.uni-heidelberg.de)                                                     
+or on Discord via the private chat.                                                                                                  
