@@ -8,6 +8,7 @@
 			"args": [
 				"-g",
 				"${file}",
+				"${fileDirname}/pcg_basic.c",
 				"-o",
                                 "${fileDirname}/${fileBasenameNoExtension}",
                                 "-lm"
