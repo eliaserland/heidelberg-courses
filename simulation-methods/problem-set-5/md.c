@@ -224,8 +224,8 @@ void calc_energies(particle *p, int ntot, double *ekin, double *epot) {
 
 
 /*
-* Main driver routine.
-*/
+ * Main driver routine.
+ */
 int main(int argc, char **argv) {
 	
 	// Input parameters.
