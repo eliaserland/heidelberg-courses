@@ -1,34 +1,33 @@
 # Makefile for Problem Set 5, Fundamentals of Simulation Methods
-# 2020-11-10
+# Author: Elias Olofsson
+# Date: 2020-12-09
 #
 # Useage:
-# make 		- compile all binaries
-# make clean		- clean all binaries 
+# make 			- compile binaries
+# make clean		- clean binaries 
 # make memtest		- test for memory leaks with valgrind
 
-EXE = test
+EXE = md
 
 SRC = pcg_basic.c
 OBJ = $(SRC:.c=.o)
 
 CC = gcc
-CFLAGS = -std=c99 -Wall -g -lm	#-I../datastructures-v1.0.8.2/include
+CFLAGS = -std=c99 -Wall -g -lm
 
 all:	$(EXE)
 
 # Object file for library
 obj:	$(OBJ)
 
-# Test for memory leaks
-memtest: memtest1
-
 # Clean up
 clean:
 	-rm -f $(EXE) $(OBJ)
-	
-test: test.c $(SRC)
+
+# Compile executable
+md: md.c $(SRC)
 	gcc $^ -o $@ $(CFLAGS)
 
-memtest1: test
+# Test for memory leaks
+memtest: md
 	valgrind --leak-check=full --show-reachable=yes ./$<
-

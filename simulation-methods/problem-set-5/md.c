@@ -45,8 +45,14 @@ void create_neighborlist(particle *p, int N_tot, double boxsize, double neighbor
 	double dr[3];
 	double neighbor_cut2 = neighbor_cut * neighbor_cut;
 
+	/* Reset all neighbour lists (only the length needs to be reset, we can 
+	   leave the actual arrays of neigbor indicies). */
+	for (int i = 0; i < N_tot; i++) {
+		p[i].n_neighbors = 0;
+	}
+
 	for (int i = 0; i < N_tot-1; i++) {
-		for (int j = i+1; i < N_tot; i++) {
+		for (int j = i+1; j < N_tot; j++) {
 			
 			// Calculate squared distance from i to j.
       			double r2 = 0;
@@ -98,8 +104,6 @@ void initialize(particle *p, double L, int N1d, double sigma_v, double neighbor_
 				p[n].acc[m] = 0;
 				p[n].acc_prev[m] = 0;
 			}
-
-			p[n].n_neighbors = 0;
 			// --- end ---
 			n++;
 			}
@@ -135,7 +139,7 @@ void drift(particle * p, int ntot, double boxsize, double dt) {
 			p[i].pos[k] += dt*p[i].vel[k] + dt*dt/2*p[i].acc[k];
 
 			// If outside box, map back.
-			if (p[i].pos[k] > boxsize) {
+			if (p[i].pos[k] >= boxsize) {
 				p[i].pos[k] -= boxsize; 
 			}
 			if (p[i].pos[k] < 0) {
@@ -152,7 +156,7 @@ void calc_forces(particle * p, int ntot, double boxsize, double rcut)
 {
 	int n;
 	double rcut2 = rcut * rcut;
-	double r2, r, r6, r12, dr[3], acc[3], pot;
+	double r2, r6, r12, dr[3], acc[3], pot;
 
 	// Store the accelerations of the previous step, and then set all the 
 	// current accelerations and potentials to zero.
@@ -170,7 +174,7 @@ void calc_forces(particle * p, int ntot, double boxsize, double rcut)
 			int j = p[i].neighbors[n];
 
 			// Calculate squared distance.
-			double r2 = 0;
+			r2 = 0;
 			for (int k = 0; k < 3; k++) {
 				dr[k] = p[i].pos[k] - p[j].pos[k];
 
@@ -186,7 +190,6 @@ void calc_forces(particle * p, int ntot, double boxsize, double rcut)
 
 			// --- students ---
 			if (r2 < rcut2) {
-				//r = sqrt(r2);
 				r6 = r2 * r2 * r2;
 				r12 = r6 * r6;
 
@@ -197,7 +200,7 @@ void calc_forces(particle * p, int ntot, double boxsize, double rcut)
 
 				// Calculate the Lennard-Jones force between the particles.
 				for (int k = 0; k < 3; k++) {
-					acc[k] = -24/r2*(2/r12-1/r6)*dr[k];
+					acc[k] = 24/r2*(2/r12-1/r6)*dr[k];
 					p[i].acc[k] += acc[k];
 					p[j].acc[k] -= acc[k];
 				}
@@ -231,10 +234,10 @@ void calc_energies(particle *p, int ntot, double *ekin, double *epot) {
 int main(int argc, char **argv) {
 	
 	// Input parameters.
-	double target_temperature = 120.0; // target temperature
+	double target_temperature = 80; // Target temperature
 	double sig_v = sqrt(target_temperature / 120.0);
-	int N1d = 5; // particles per dimension
-	int N = N1d * N1d * N1d; // total particle number
+	int N1d = 5; 		 // Particles per dimension
+	int N = N1d * N1d * N1d; // Total number of particles.
 
 	// Box parameters.
 	double L = 5.0 * N1d;
@@ -243,12 +246,12 @@ int main(int argc, char **argv) {
 
 	// Time control.
 	int output_frequency = 10;
-	int nsteps = 1000; // number of steps to take
-	double dt = 0.01; // timestep size
+	int nsteps = 10000; 	// Number of iterations
+	double dt = 0.01; 	// Timestep size
 
 	// Neighbor lists.
-	double neighbor_cut = L; // Cutoff radius for neighbor lists (must be larger than rcut).
-	int list_freq = 10;	 // Re-build neighbor lists every n:th iteration.
+	double neighbor_cut = 2*rcut; // Cutoff radius for neighbor lists (must be larger than rcut).
+	int list_freq = 1;	 // Re-build neighbor lists every n:th iteration.
 
 	/* If neighbor cutoff is large, all neighborlists will remain unchanged. 
 	   Avoid unnecessary computations by building lists only once. */ 
@@ -256,8 +259,9 @@ int main(int argc, char **argv) {
 		list_freq = nsteps;
 	}
 
-	double ekin, epot;
-	double r;
+	double ekin; 
+	double epot;
+	double t = 0;
 
 	// Allocate storage for our particles.
 	particle *p = malloc(N * sizeof(particle));
@@ -275,14 +279,15 @@ int main(int argc, char **argv) {
 
 	// Measure energies at beginning, and output this to the file and screen.
 	calc_energies(p, N, &ekin, &epot);
-	fprintf(fd, "%6d %10g %10g %10.8g\n", 0, ekin, epot, ekin + epot);
+	fprintf(fd, "%6f %13.8e %13.8e %13.8e\n", t, ekin, epot, ekin + epot);
 
-	printf("nsteps: %d, T: %f \n", nsteps, target_temperature);
+	printf("nsteps: %d, dt: %.4f, T: %.4f \n", nsteps, dt, target_temperature);
 
 	// --- students ---
+	
 
 	// Carry out the time integration using leapfrog integration.
-	clock_t tic = clock();
+	//clock_t tic = clock();
 	for (int step = 0; step < nsteps; step++) {
 		
 		// Full step in positions (Velocity-Verlet). 
@@ -294,6 +299,9 @@ int main(int argc, char **argv) {
 		// Full step in velocity (Velocity-Verlet).
 		kick(p, N, dt);	
 
+		// Update time.
+		t += dt;
+
 		// Re-construct neighbor lists.
 		if (step % list_freq == 0) {
 			create_neighborlist(p, N, boxsize, neighbor_cut);
@@ -302,10 +310,9 @@ int main(int argc, char **argv) {
 		// Calculate kinetic, potential and total energies.
 		if (step % output_frequency == 0) {
 			calc_energies(p, N, &ekin, &epot);
-			fprintf(fd, "%6d %10g %10g %10.8g\n", step, ekin, epot, ekin + epot);
+			fprintf(fd, "%6f %13.8e %13.8e %13.8e\n", t, ekin, epot, ekin + epot);
 		}
 	}
-
 
 	// Free dynamically allocated memory.
 	free(p);
@@ -314,8 +321,7 @@ int main(int argc, char **argv) {
 	fclose(fd);
 
 	// --- end ---
-	
-	printf("boxsize = %20.6f\n", boxsize);
+	printf("boxsize = %.3f\n", boxsize);
 
 	return 0;
 }
