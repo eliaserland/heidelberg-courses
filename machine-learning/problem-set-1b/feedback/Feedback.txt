@@ -1,0 +1,48 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐                                            
+│                                     Feedback to Exercise 01b                                     │                                            
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘                                            
+               Handed in as: knobloch-catherine_olofsson-elias_siegl-julia_ex01b.zip                                                            
+                                                                                                                                                
+                            Great, thanks for naming the file correctly.                                                                        
+                                                                                                                                                
+                          This feedback is for:                                                                                                 
+                          • Catherine Knobloch (cknobloch1998@gmail.com)                                                                        
+                          • Elias Olofsson (ub253@stud.uni-heidelberg.de)                                                                       
+                          • Julia Siegl (Siegl@stud.uni-heidelberg.de)                                                                          
+                                                 
+                                                                                              
+                                 E 1 (20.0) │ E 2 (8.0) │ ∑ (28.0)                                                                              
+                                 ───────────┼───────────┼─────────                                                                              
+                                    20.0    │    8.0    │   28.0                                                                                
+                                                 
+                                                                                              
+Exercise  1                                                                            [20.0 / 20.0]                                            
+────────────────────────────────────────────────────────────────────────────────────────────────────                                            
+                                                                                                                                                
+3.1                                                                                                                                             
+- [@-0.5] You must have overread the interpolation="bicubic". Arguably, it was not epxlicit enough in the execise.                              
+                                                                                                                                                
+3.2                                                                                                                                             
+- [@+0.5] for your extra-inefficient code :D                                                                                                    
+                                                                                                                                                
+3.3                                                                                                                                             
+- Don't worry that your matrices were equal, seems like this is platform-dependent (was the same on my machine when running the sample solution)
+- Sure, %timeit does a bit more. Especially, it warns you when one run is significantly faster/slower than others, i.e. when results are cached.
+                                                                                                                                                
+3.4                                                                                                                                             
+- The heavy part of argpartition is sorting, so only slightly slower probably.                                                                  
+- I have nothing to add to your comments.                                                                                                       
+                                                                                                                                                
+                                                                                                                                                
+                                                                                                                                                
+Exercise  2                                                                              [8.0 / 8.0]                                            
+────────────────────────────────────────────────────────────────────────────────────────────────────                                            
+- Sorry, we uploaded an outdated version of the sample solution.                                                                                
+- Well organised table, no need for Pandas then                                                                                                 
+- Perfect agreement with sklearn, well done!                                                                                                    
+
+                                                                                                                                               
+════════════════════════════════════════════════════════════════════════════════════════════════════                                            
+This feedback was created by Felix (Felix Draxler).                                                                                             
+Please ask questions about the feedback to (felix.draxler@iwr.uni-heidelberg.de)                                                                
+or on Discord via the private chat.                                                                                                             
