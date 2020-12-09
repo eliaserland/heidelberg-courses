@@ -21,7 +21,7 @@ typedef struct {
 	double acc[3];
 	double acc_prev[3];
 	double pot;
-	int n_neighbors; 		// Length of neighbor list
+	int n_neighbors; 	// Length of neighbor list
 	int neighbors[MAXPART]; // Neighbors (with index larger than current particle)
 } particle;
 
@@ -48,22 +48,21 @@ void create_neighborlist(particle *p, int N_tot, double boxsize, double neighbor
 	for (int i = 0; i < N_tot-1; i++) {
 		for (int j = i+1; i < N_tot; i++) {
 			
-			// Calculate squared distance.
-      		double r2 = 0;
-      		for (int k = 0; k < 3; k++) {
-        		dr[k] = p[i].pos[k] - p[j].pos[k];
+			// Calculate squared distance from i to j.
+      			double r2 = 0;
+			for (int k = 0; k < 3; k++) {
+				dr[k] = p[i].pos[k] - p[j].pos[k];
 
 				// Ensure we find the shortest distance bewteen particles
 				if (dr[k] > 0.5 * boxsize) {
 					dr[k] -= boxsize;
 				}
-	        	if (dr[k] < -0.5 * boxsize) {
-          			dr[k] += boxsize;
-        		}
-        		r2 += dr[k] * dr[k];
-      		}
-
-			// If within neighbor radius, add to neighbor list.
+				if (dr[k] < -0.5 * boxsize) {
+					dr[k] += boxsize;
+				}
+				r2 += dr[k] * dr[k];
+			}
+			// If within neighbor radius, add j to i's neighbor list.
 			if (r2 < neighbor_cut2) {
 				n_count = p[i].n_neighbors;
 				p[i].neighbors[n_count] = j;
@@ -84,7 +83,7 @@ void initialize(particle *p, double L, int N1d, double sigma_v, double neighbor_
 	pcg32_srandom_r(&rngptr, time(NULL), (intptr_t)&rngptr);
 
 	for(int i = 0; i < N1d; i++) {
-    	for(int j = 0; j < N1d; j++) {
+	    	for(int j = 0; j < N1d; j++) {
 			for(int k = 0; k < N1d; k++) {
 			// --- students ---
 			p[n].pos[0] = (0.5+k)*dl;
@@ -95,13 +94,17 @@ void initialize(particle *p, double L, int N1d, double sigma_v, double neighbor_
 			p[n].vel[1] = sigma_v*gaussian_rnd(&rngptr);
 			p[n].vel[2] = sigma_v*gaussian_rnd(&rngptr);
 
+			for (int m = 0; m < 3; m++) {
+				p[n].acc[m] = 0;
+				p[n].acc_prev[m] = 0;
+			}
+
 			p[n].n_neighbors = 0;
 			// --- end ---
 			n++;
 			}
 		}
   	}
-
 	// Create neighbor lists.
 	int N_tot = N1d * N1d * N1d;
 	create_neighborlist(p, N_tot, L, neighbor_cut);
@@ -111,11 +114,11 @@ void initialize(particle *p, double L, int N1d, double sigma_v, double neighbor_
    given time interval. */
 void kick(particle * p, int ntot, double dt) {
 	// --- students ---
-	// For all particles, and each dimension.
+	// For all particles and each dimension.
 	for (int i = 0; i < ntot; i++){
 		for (int k = 0; k < 3; k++) {
-			// Kick particle
-			p[i].vel[k] += dt*p[i].acc[k];
+			// Kick particle (Velocity-Verlet).
+			p[i].vel[k] += dt/2*(p[i].acc[k] + p[i].acc_prev[k]);
 		}
 	}
 	// --- end ---
@@ -125,11 +128,11 @@ void kick(particle * p, int ntot, double dt) {
 // Afterwards, the particles are mapped periodically back to the box if needed.
 void drift(particle * p, int ntot, double boxsize, double dt) {
 	// --- students ---
-	// For all particles, and each dimension.
+	// For all particles and each dimension.
 	for (int i = 0; i < ntot; i++){
 		for (int k = 0; k < 3; k++) {
-			// Drift position.
-			p[i].pos[k] += dt*p[i].vel[k];
+			// Drift position (Velocity-Verlet).
+			p[i].pos[k] += dt*p[i].vel[k] + dt*dt/2*p[i].acc[k];
 
 			// If outside box, map back.
 			if (p[i].pos[k] > boxsize) {
@@ -151,10 +154,12 @@ void calc_forces(particle * p, int ntot, double boxsize, double rcut)
 	double rcut2 = rcut * rcut;
 	double r2, r, r6, r12, dr[3], acc[3], pot;
 
-	// First, set all the accelerations and potentials to zero.
+	// Store the accelerations of the previous step, and then set all the 
+	// current accelerations and potentials to zero.
 	for (int i = 0; i < ntot; i++) {
 		p[i].pot = 0;
-    	for (int k = 0; k < 3; k++) {
+    		for (int k = 0; k < 3; k++) {
+			p[i].acc_prev[k] = p[i].acc[k]; 
 			p[i].acc[k] = 0;
 		}
   	}
@@ -162,44 +167,43 @@ void calc_forces(particle * p, int ntot, double boxsize, double rcut)
 	// Sum over all distinct pairs.
 	for (int i = 0; i < ntot; i++) {
 		for (n = 0; n < p[i].n_neighbors; n++) {
-      		int j = p[i].neighbors[n];
+			int j = p[i].neighbors[n];
 
- 			// Calculate squared distance.
-      		double r2 = 0;
-      		for (int k = 0; k < 3; k++) {
-        		dr[k] = p[i].pos[k] - p[j].pos[k];
+			// Calculate squared distance.
+			double r2 = 0;
+			for (int k = 0; k < 3; k++) {
+				dr[k] = p[i].pos[k] - p[j].pos[k];
 
 				// Ensure we find the shortest distance bewteen particles
 				if (dr[k] > 0.5 * boxsize) {
 					dr[k] -= boxsize;
 				}
+				if (dr[k] < -0.5 * boxsize) {
+					dr[k] += boxsize;
+				}
+				r2 += dr[k] * dr[k];
+			}
 
-	        	if (dr[k] < -0.5 * boxsize) {
-          			dr[k] += boxsize;
-        		}
-        		r2 += dr[k] * dr[k];
-      		}
-
-      		// --- students ---
-      		if (r2 < rcut2) {
+			// --- students ---
+			if (r2 < rcut2) {
 				//r = sqrt(r2);
 				r6 = r2 * r2 * r2;
 				r12 = r6 * r6;
 
-        		// Calculate the Lennard-Jones potential for the pair.
-        		pot = 4*(1/r12-1/r6);
-        		p[i].pot += pot;
-        		p[j].pot += pot;
+				// Calculate the Lennard-Jones potential for the pair.
+				pot = 4*(1/r12-1/r6);
+				p[i].pot += pot;
+				p[j].pot += pot;
 
 				// Calculate the Lennard-Jones force between the particles.
 				for (int k = 0; k < 3; k++) {
-				acc[k] = -24/r2*(2/r12-1/r6)*dr[k];
-				p[i].acc[k] += acc[k];
-				p[j].acc[k] -= acc[k];
+					acc[k] = -24/r2*(2/r12-1/r6)*dr[k];
+					p[i].acc[k] += acc[k];
+					p[j].acc[k] -= acc[k];
 				}
-      		}
-      		// --- end ---
-    	}
+			}
+			// --- end ---
+		}
   	}
 }
 
@@ -208,15 +212,13 @@ void calc_energies(particle *p, int ntot, double *ekin, double *epot) {
 	double sum_pot = 0, sum_kin = 0;
 
   	for (int i = 0; i < ntot; i++) {
-    	sum_pot += p[i].pot;
-
-    	// --- students ---
-    	for(int k = 0; k < 3; k++) {
-      		sum_kin += p[i].vel[k]*p[i].vel[k];
-    	}
+    		sum_pot += p[i].pot;
+		// --- students ---
+		for(int k = 0; k < 3; k++) {
+			sum_kin += p[i].vel[k] * p[i].vel[k];
+		// --- end ---
+		}
   	}
-  		// --- end ---
-
   	*ekin = 0.5 * sum_kin / ntot;
   	*epot = 0.5 * sum_pot / ntot;
 }
@@ -244,11 +246,12 @@ int main(int argc, char **argv) {
 	int nsteps = 1000; // number of steps to take
 	double dt = 0.01; // timestep size
 
-	// Neighbor lists
-	double neighbor_cut = L; // Cutoff radius for neighbor lists.
-	int list_freq = 10;	// Re-build neighbor lists every n:th iteration.
+	// Neighbor lists.
+	double neighbor_cut = L; // Cutoff radius for neighbor lists (must be larger than rcut).
+	int list_freq = 10;	 // Re-build neighbor lists every n:th iteration.
 
-	// If neighbor cutoff is large, all neighborlists will remain unchanged anyway. 
+	/* If neighbor cutoff is large, all neighborlists will remain unchanged. 
+	   Avoid unnecessary computations by building lists only once. */ 
 	if (neighbor_cut > sqrt(3)/2*L) {
 		list_freq = nsteps;
 	}
@@ -276,50 +279,43 @@ int main(int argc, char **argv) {
 
 	printf("nsteps: %d, T: %f \n", nsteps, target_temperature);
 
-
 	// --- students ---
-	double t = 0;
-
 
 	// Carry out the time integration using leapfrog integration.
 	clock_t tic = clock();
 	for (int step = 0; step < nsteps; step++) {
 		
-		// Re-construct neighbor lists.
-		if (step % list_freq == 0) {
-			create_neighborlist(p, N, boxsize, neighbor_cut);
-		}
-		
-		// Halfstep in velocity.
-		kick(p, N, dt/2);	
-
-		// Full step in position, using halfstep in velocity.
+		// Full step in positions (Velocity-Verlet). 
 		drift(p, N, boxsize, dt); 
 
 		// Update accelerations at the new positions.
 		calc_forces(p, N, boxsize, rcut);
-		 
-		// Get next step in velocity. Now are velocity and position in sync.
-		kick(p, N, dt/2);
 
+		// Full step in velocity (Velocity-Verlet).
+		kick(p, N, dt);	
 
-		t += dt;
-
-		calc_energies(p, N, &ekin, &epot);
-
-		if (step % output_frequency == 0) {
-			fprintf(fd, "%6d %10g %10g %10.8g\n", t, ekin, epot, ekin + epot);
+		// Re-construct neighbor lists.
+		if (step % list_freq == 0) {
+			create_neighborlist(p, N, boxsize, neighbor_cut);
 		}
 
-
+		// Calculate kinetic, potential and total energies.
+		if (step % output_frequency == 0) {
+			calc_energies(p, N, &ekin, &epot);
+			fprintf(fd, "%6d %10g %10g %10.8g\n", step, ekin, epot, ekin + epot);
+		}
 	}
 
 
-	// FREE MEMORY?!?
+	// Free dynamically allocated memory.
+	free(p);
+
+	// Close file.
+	fclose(fd);
+
 	// --- end ---
 	
 	printf("boxsize = %20.6f\n", boxsize);
-	fclose(fd);
 
 	return 0;
 }
