@@ -9,7 +9,9 @@
 
 #define PIXELS  512
 
-/* Reads a square image in 8-bit/color PPM format from the given file. Note: No checks on valid format are done. 
+/* 
+ * Reads a square image in 8-bit/color PPM format from the given file. 
+ * Note: No checks on valid format are done. 
  */
 void read_image(char *fname, int pixels, double *red, double *green, double *blue)
 {
@@ -37,8 +39,8 @@ void read_image(char *fname, int pixels, double *red, double *green, double *blu
     	}
 }
 
-
-/* Writes a square image in 8-bit/color PPM format.
+/*
+ * Writes a square image in 8-bit/color PPM format.
  */
 void write_image(char *fname, int pixels, double *red, double *green, double *blue)
 {
@@ -65,8 +67,6 @@ void write_image(char *fname, int pixels, double *red, double *green, double *bl
       		exit(1);
     	}
 }
-
-
 
 int main(int argc, char **argv)
 {
