@@ -8,9 +8,15 @@
 #include <fftw3.h>
 
 #define M_PI 3.14159265358979323846
-
 #define PIXELS  512
 
+/*
+ * 	Fundamentals of Simulation Methods - WiSe 2020/2021
+ * 	Problem Set 6 - Exercise 1
+ *
+ * 	Author: Elias Olofsson
+ * 	Date: 2020-12-16
+ */
 
 
 /* 
@@ -89,8 +95,8 @@ int main(int argc, char **argv)
   	/* Now we set up our desired smoothing kernel. We'll use complex number for it even though it is real. */
 
   	/* first, some space allocation */
-  	fftw_complex *kernel_real = malloc(PIXELS * PIXELS * sizeof(fftw_complex));
-  	fftw_complex *kernel_kspace = malloc(PIXELS * PIXELS * sizeof(fftw_complex));
+  	fftw_complex *kernel_real = fftw_malloc(PIXELS * PIXELS * sizeof(fftw_complex));
+  	fftw_complex *kernel_kspace = fftw_malloc(PIXELS * PIXELS * sizeof(fftw_complex));
 
 	double r_h, ix, jx;
   	double hsml = 10.0;
@@ -138,8 +144,8 @@ int main(int argc, char **argv)
 
 
   	/* further space allocations for image transforms */
-  	fftw_complex *color_real   = malloc(PIXELS * PIXELS * sizeof(fftw_complex));
-  	fftw_complex *color_kspace = malloc(PIXELS * PIXELS * sizeof(fftw_complex));
+  	fftw_complex *color_real   = fftw_malloc(PIXELS * PIXELS * sizeof(fftw_complex));
+  	fftw_complex *color_kspace = fftw_malloc(PIXELS * PIXELS * sizeof(fftw_complex));
 
   	/* create corresponding FFT plans */
   	fftw_plan plan_forward  = fftw_plan_dft_2d (PIXELS, PIXELS, color_real, color_kspace, FFTW_FORWARD, FFTW_ESTIMATE);
@@ -188,7 +194,20 @@ int main(int argc, char **argv)
       
   	write_image("aq-smoothed.ppm", PIXELS, red, green, blue);
   	
-  	free(red);
+	/* Clean up all dynamically allocated memory. */
+	
+	fftw_destroy_plan(plan_kernel);
+	fftw_destroy_plan(plan_forward);
+	fftw_destroy_plan(plan_backward);
+
+  	fftw_free(kernel_real);  	
+  	fftw_free(kernel_kspace);
+  	fftw_free(color_real);
+  	fftw_free(color_kspace);
+  	
+  	fftw_cleanup();
+
+	free(red);
   	free(green);
   	free(blue);
 
