@@ -7,7 +7,11 @@
 #include <time.h>
 #include <fftw3.h>
 
+#define M_PI 3.14159265358979323846
+
 #define PIXELS  512
+
+
 
 /* 
  * Reads a square image in 8-bit/color PPM format from the given file. 
@@ -17,7 +21,7 @@ void read_image(char *fname, int pixels, double *red, double *green, double *blu
 {
 	FILE *fd;
 
-  	if (fd = fopen(fname, "r")) {
+  	if ((fd = fopen(fname, "r"))) {
       		int row, col, width, height, maxvalue;
 
      		fscanf(fd, "P6 %d %d %d ", &width, &height, &maxvalue);
@@ -46,7 +50,7 @@ void write_image(char *fname, int pixels, double *red, double *green, double *bl
 {
 	FILE *fd;
 
-  	if (fd = fopen(fname, "w")) {
+  	if ((fd = fopen(fname, "w"))) {
       		int row, col;
 
       		fprintf(fd, "P6\n%d %d\n%d\n", pixels, pixels, 255);
@@ -88,27 +92,38 @@ int main(int argc, char **argv)
   	fftw_complex *kernel_real = malloc(PIXELS * PIXELS * sizeof(fftw_complex));
   	fftw_complex *kernel_kspace = malloc(PIXELS * PIXELS * sizeof(fftw_complex));
 
+	double r_h, ix, jx;
   	double hsml = 10.0;
+	double k = 40./(7.*M_PI*hsml*hsml); 
 
   	/* now set the values of the kernel */
-  	for(i=0; i < PIXELS; i++) {
-    		for(j=0; j < PIXELS; j++) {
+  	for (i=0; i < PIXELS; i++) {
+    		for (j=0; j < PIXELS; j++) {
 			kernel_real[i*PIXELS + j][0] = 0;  /* real part */
 			kernel_real[i*PIXELS + j][1] = 0;  /* imaginary part */
 
 
 			/* do something sensible here to set the real part of the kernel */
-
-			/*
-			 *
-			 *
-			 *
-			 *
-			 *     kernel_real[i*PIXELS + j][0] = ....
-			 *
-			 *
-			 *
-			 */
+				
+			if (i >= PIXELS/2) {
+				ix = i - PIXELS;
+			} else {
+				ix = i;
+			}
+			
+			if (j >= PIXELS/2) {
+				jx = j - PIXELS;
+			} else {
+				jx = j;
+			}
+			
+			r_h = sqrt(ix*ix + jx*jx)/hsml;
+			
+			if (r_h < 0.5) {
+				kernel_real[i*PIXELS + j][0] = k*(1.+6.*r_h*r_h*(r_h-1.));
+			} else if (r_h < 1.0) {
+				kernel_real[i*PIXELS + j][0] = k*2.*(1.-r_h)*(1.-r_h)*(1.-r_h);
+			}
       		}
 	}
   
@@ -123,11 +138,11 @@ int main(int argc, char **argv)
 
 
   	/* further space allocations for image transforms */
-  	fftw_complex *color_real = malloc(PIXELS * PIXELS * sizeof(fftw_complex));
+  	fftw_complex *color_real   = malloc(PIXELS * PIXELS * sizeof(fftw_complex));
   	fftw_complex *color_kspace = malloc(PIXELS * PIXELS * sizeof(fftw_complex));
 
   	/* create corresponding FFT plans */
-  	fftw_plan plan_forward =  fftw_plan_dft_2d (PIXELS, PIXELS, color_real, color_kspace, FFTW_FORWARD, FFTW_ESTIMATE);
+  	fftw_plan plan_forward  = fftw_plan_dft_2d (PIXELS, PIXELS, color_real, color_kspace, FFTW_FORWARD, FFTW_ESTIMATE);
   	fftw_plan plan_backward = fftw_plan_dft_2d (PIXELS, PIXELS, color_kspace, color_real, FFTW_BACKWARD, FFTW_ESTIMATE);
 
   
@@ -155,17 +170,8 @@ int main(int argc, char **argv)
       		/* multiply with kernel in Fourier space */
       		for (i=0; i < PIXELS; i++) {
 			for (j=0; j < PIXELS; j++) {
-
-		    		/*
-		     		 *
-		     		 *
-		     		 *  FILL IN CODE HERE.....
-		     		 *
-		     		 *     color_kspace[i*PIXELS + j][0] = .....
-		     		 *     color_kspace[i*PIXELS + j][1] = .....
-		     		 * 
-		     		 *
-		     		 */
+		    		color_kspace[i*PIXELS + j][0] *= kernel_kspace[i*PIXELS + j][0]; 
+		     		color_kspace[i*PIXELS + j][1] *= kernel_kspace[i*PIXELS + j][1]; 
 	  		}
   		}
 
@@ -181,6 +187,10 @@ int main(int argc, char **argv)
     	}
       
   	write_image("aq-smoothed.ppm", PIXELS, red, green, blue);
+  	
+  	free(red);
+  	free(green);
+  	free(blue);
 
   	return 0;
 }
