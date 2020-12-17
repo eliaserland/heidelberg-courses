@@ -3,7 +3,8 @@
         {
             "name": "Linux",
             "includePath": [
-                "${workspaceFolder}/**"
+                "${workspaceFolder}/**",
+                "/home/elias/Documents/fftw-3.3.9/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/gcc",
