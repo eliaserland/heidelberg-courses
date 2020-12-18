@@ -27,18 +27,18 @@ void read_image(char *fname, int pixels, double *red, double *green, double *blu
 	FILE *fd;
 
   	if ((fd = fopen(fname, "r"))) {
-      		int row, col, width, height, maxvalue;
+      		int width, height, maxvalue;
 
      		fscanf(fd, "P6 %d %d %d ", &width, &height, &maxvalue);
 
-      		for(row=0; row < pixels; row++) {
-			for(col=0; col < pixels; col++) {
+      		for(int i = 0; i < pixels; i++) {
+			for(int j = 0; j < pixels; j++) {
 	    			unsigned char rgb[3];
 	    			fread(rgb, 3, sizeof(char), fd);
 
-		    		red[row*pixels + col] 	= rgb[0];
-				green[row*pixels + col] = rgb[1];
-				blue[row*pixels + col]  = rgb[2];
+		    		red[i*pixels + j]   = rgb[0];
+				green[i*pixels + j] = rgb[1];
+				blue[i*pixels + j]  = rgb[2];
 	  		}
 	  	}
      		fclose(fd);
@@ -56,16 +56,15 @@ void write_image(char *fname, int pixels, double *red, double *green, double *bl
 	FILE *fd;
 
   	if ((fd = fopen(fname, "w"))) {
-      		int row, col;
 
       		fprintf(fd, "P6\n%d %d\n%d\n", pixels, pixels, 255);
 
-      		for(row=0; row < pixels; row++) {
-			for(col=0; col < pixels; col++) {
+      		for (int i = 0; i < pixels; i++) {
+			for (int j = 0; j < pixels; j++) {
 		    		unsigned char rgb[3];
-		    		rgb[0] = red[row*pixels + col];
-		    		rgb[1] = green[row*pixels + col];
-		    		rgb[2] = blue[row*pixels + col];
+		    		rgb[0] = red[i*pixels + j];
+		    		rgb[1] = green[i*pixels + j];
+		    		rgb[2] = blue[i*pixels + j];
 
 	    			fwrite(rgb, 3, sizeof(char), fd);
 	  		}
@@ -125,12 +124,14 @@ int main(int argc, char **argv)
   	/* Now we set up our desired smoothing kernel. We'll use complex number for it even though it is real. */
 
   	/* first, some space allocation */
-  	fftw_complex *kernel_real = fftw_malloc(PIXELS * PIXELS * sizeof(fftw_complex));
+  	fftw_complex *kernel_real   = fftw_malloc(PIXELS * PIXELS * sizeof(fftw_complex));
   	fftw_complex *kernel_kspace = fftw_malloc(PIXELS * PIXELS * sizeof(fftw_complex));
 
-	double r_h, ix, jx;
+	double r, ix, jx;
   	double hsml = 10.0;
-	double k = 40./(7.*M_PI*hsml*hsml); 
+	double k = 40.0/(7.0*M_PI*hsml*hsml);
+	
+	double sum = 0; 
 
   	/* now set the values of the kernel */
   	for (i=0; i < PIXELS; i++) {
@@ -139,26 +140,32 @@ int main(int argc, char **argv)
 			kernel_real[i*PIXELS + j][1] = 0;  /* imaginary part */
 
 			/* do something sensible here to set the real part of the kernel */
+			
+			ix = (double) i;
+			jx = (double) j;
 				
-			if (i >= PIXELS/2) {
-				ix = i-PIXELS;
-			} else {
-				ix = i;
+			if (ix >= PIXELS/2.0) {
+				ix -= PIXELS;
 			}
-			if (j >= PIXELS/2) {
-				jx = j-PIXELS;
-			} else {
-				jx = j;
+			if (jx >= PIXELS/2.0) {
+				jx -= PIXELS;
 			}
 			
-			r_h = sqrt(ix*ix + jx*jx)/hsml;
+			r = sqrt(ix*ix + jx*jx)/hsml;
 			
-			if (r_h < 0.5) {
-				kernel_real[i*PIXELS + j][0] = k*(1.+6.*r_h*r_h*(r_h-1.));
-			} else if (r_h < 1.0) {
-				kernel_real[i*PIXELS + j][0] = k*2.*(1.-r_h)*(1.-r_h)*(1.-r_h);
+			if (r < 0.5) {
+				kernel_real[i*PIXELS + j][0] = k*(1.0+6.0*r*r*(r-1.0));
+			} else if (r < 1.0) {
+				kernel_real[i*PIXELS + j][0] = k*2.0*(1.0-r)*(1.0-r)*(1.0-r);
 			}
+			sum += kernel_real[i*PIXELS + j][0];
       		}
+	}
+	
+	for (i=0; i < PIXELS; i++) {
+    		for (j=0; j < PIXELS; j++) {
+			kernel_real[i*PIXELS + j][0] /= sum;
+		}	
 	}
   
 
@@ -179,6 +186,8 @@ int main(int argc, char **argv)
   	fftw_plan plan_forward  = fftw_plan_dft_2d (PIXELS, PIXELS, color_real, color_kspace, FFTW_FORWARD, FFTW_ESTIMATE);
   	fftw_plan plan_backward = fftw_plan_dft_2d (PIXELS, PIXELS, color_kspace, color_real, FFTW_BACKWARD, FFTW_ESTIMATE);
 
+  
+  	double color_rel, color_img, kern_rel, kern_img; 
   
 	/* we now convolve each color channel with the kernel using FFTs */
 	for (colindex = 0; colindex < 3; colindex++) {
@@ -204,8 +213,16 @@ int main(int argc, char **argv)
       		/* multiply with kernel in Fourier space */
       		for (i=0; i < PIXELS; i++) {
 			for (j=0; j < PIXELS; j++) {
-		    		color_kspace[i*PIXELS + j][0] *= kernel_kspace[i*PIXELS + j][0]; 
-		     		color_kspace[i*PIXELS + j][1] *= kernel_kspace[i*PIXELS + j][1]; 
+				
+				// Fetch real and imaginary parts of color and kernel.
+				color_rel = color_kspace[i*PIXELS + j][0];
+				color_img = color_kspace[i*PIXELS + j][1];
+				kern_rel = kernel_kspace[i*PIXELS + j][0];
+				kern_img = kernel_kspace[i*PIXELS + j][1];
+			
+				// Complex multiplication.
+		    		color_kspace[i*PIXELS + j][0] = color_rel*kern_rel - color_img*kern_img; 
+		     		color_kspace[i*PIXELS + j][1] = color_rel*kern_img + color_img*kern_rel;
 	  		}
   		}
 
