@@ -1,0 +1,22 @@
+Object-Oriented Programming for Scientific Computing
+Heidelberg University
+
+
+WiSe 2020/2021 Course page:
+https://conan.iwr.uni-heidelberg.de/teaching/oopfsc_ws2020/
+
+
+
+
+
+Useful links:
+
+https://isocpp.org/std/the-standard
+
+https://isocpp.org/get-started
+
+https://en.cppreference.com/w/
+
+
+
+
