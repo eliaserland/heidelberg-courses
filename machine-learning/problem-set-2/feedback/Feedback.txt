@@ -1,0 +1,44 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐       
+│                                     Feedback to Exercise 02                                      │       
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘       
+                Handed in as: Olofsson-Elias_Knobloch-Catherine_Siegl-Julia_ex02.zip                       
+                                                                                                           
+                            Great, thanks for naming the file correctly.                                   
+                                                                                                           
+              Please try to discuss your results BEFORE you get the solution aswell.                       
+                                                                                                           
+                          This feedback is for:                                                            
+                          • Elias Olofsson (ub253@stud.uni-heidelberg.de)                                  
+                          • Catherine Knobloch (cknobloch1998@gmail.com)                                   
+                          • Julia Siegl (Siegl@stud.uni-heidelberg.de)                                     
+                                                 
+                                                         
+                     E 1 (8.0) │ E 2 (7.0) │ E 3 (17.0) │ E 4 (8.0) │ ∑ (40.0)                             
+                     ──────────┼───────────┼────────────┼───────────┼─────────                             
+                        8.5    │    7.0    │    16.0    │    7.5    │   39.0                               
+                                                 
+                                                         
+Exercise  1                                                                              [8.5 / 8.0]       
+────────────────────────────────────────────────────────────────────────────────────────────────────       
+[@+0.5] Nice and thoughtful feature selection                                                              
+                                                                                                           
+                                                                                                           
+Exercise  2                                                                              [7.0 / 7.0]       
+────────────────────────────────────────────────────────────────────────────────────────────────────       
+No comment. Apparently, everything was good.                                                               
+                                                                                                           
+Exercise  3                                                                            [16.0 / 17.0]       
+────────────────────────────────────────────────────────────────────────────────────────────────────       
+[@-0] 5.2: training and test error rates are missing (never mind, they just come later. no points deducted)
+[@-1] Discussion of QDA quality and NN classification is missing                                           
+                                                                                                           
+Exercise  4                                                                              [7.5 / 8.0]       
+────────────────────────────────────────────────────────────────────────────────────────────────────       
+[@-0.5] Discussion is missing                                                                              
+                                                                                                           
+
+                                                                                                          
+════════════════════════════════════════════════════════════════════════════════════════════════════       
+This feedback was created by Moritz (Moritz).                                                              
+Please ask questions about the feedback to (moritz.plenz@web.de)                                           
+or on Discord via the private chat.                                                                        
