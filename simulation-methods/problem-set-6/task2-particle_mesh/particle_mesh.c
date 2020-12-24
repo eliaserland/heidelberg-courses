@@ -242,10 +242,38 @@ int main(int argc, char **argv) {
 	fftw_plan plan_backward = fftw_plan_dft_2d (NGRID, NGRID, density_kspace, pot_real,
 						     FFTW_BACKWARD, FFTW_ESTIMATE);
 	
+	int idx[DIM]; 
+	double k2, l2;
+	
 	// Set up the Green's function in Fourier space.
 	for (int i = 0; i < pow(NGRID,DIM); i++) {
-		greens_kspace[i][0] = 0;	// DO SOMETHING THAT MAKES SENSE HERE
-		greens_kspace[i][1] = 0;	
+		
+		// Convert linear index i to DIM-dimensional indices.
+		for (int d = 0; d < DIM; d++) {
+			idx[d] = i % (int)pow(NGRID,d);
+		
+			// Convert to fourier frequency indices.
+			if (idx[d] >= NGRID/2) {
+				idx[d] -= NGRID;
+			}
+		}
+		
+		// Determine the squared sum of the Fourier indices.
+		l2 = 0;
+		for (int d = 0; d < DIM; d++) {
+			l2 += idx[d]*idx[d];
+		}
+		
+		// Squared sum of the k-vector.
+		k2 = 4.0*M_PI*M_PI/(L*L)*l2;		
+		
+		// Set the real part of the Green's function.
+		if (k2 == 0) {
+			greens_kspace[i][0] = 0; // Set zero-frequency to 0.
+		} else {
+			greens_kspace[i][0] = -4.0*M_PI/k2;
+		} 
+		greens_kspace[i][1] = 0;	// Imaginary part.
 	}
 	
 	// Calulate the density field from the particle positions.
