@@ -11,7 +11,7 @@
 #define M_PI 3.14159265358979323846
 
 #define DIM 2		// No. of dimensions (ONLY WORKING IN 2D FOR NOW)
-#define NGRID 256	// No. of gridpoints per dimension
+#define NGRID 512	// No. of gridpoints per dimension
 
 /*
  * 	Fundamentals of Simulation Methods - WiSe 2020/2021
@@ -92,21 +92,21 @@ void print_pos(particle *p, int NP) {
 }
 
 /** 
- * fprint_density() - Print particle density field to a file.
+ * fprint_realfield() - Print real part of a field to a file. (Density, Potential...)
  * 
- * @density: Pointer to the density field.
+ * @density: Pointer to the field.
  *
  * Returns: Nothing.   
  */
-void fprint_density(fftw_complex *density) {
+void fprint_realfield(fftw_complex *field, char *fieldname) {
 	
 	// Create an output file.
 	char fname[100];
-	sprintf(fname, "output_density.txt");
+	sprintf(fname, "output_%s.txt", fieldname);
 	FILE *fd = fopen(fname, "w");
 	
 	for (int i = 0; i < pow(NGRID,DIM); i++) {
-		fprintf(fd, "%lf ", density[i][0]);	// Print the real part.
+		fprintf(fd, "%lf ", field[i][0]);	// Print the real part.
 		if (i%NGRID == NGRID-1) {
 			fprintf(fd, "\n");
 		}		
@@ -213,6 +213,7 @@ int main(int argc, char **argv) {
 	/* Simulation settings */
 	const int NP = 1;		// No. of particles to simulate.
 	const double L = 1; 		// Box side length.
+	const double G = 1;		// Newton's gravity constant.
 	
 	// -------------------------------------------------
 	const double h = L/NGRID; 	// Grid spacing. 
@@ -242,15 +243,14 @@ int main(int argc, char **argv) {
 	fftw_plan plan_backward = fftw_plan_dft_2d (NGRID, NGRID, density_kspace, pot_real,
 						     FFTW_BACKWARD, FFTW_ESTIMATE);
 	
+	// Set up the Green's function in Fourier space.
 	int idx[DIM]; 
 	double k2, l2;
-	
-	// Set up the Green's function in Fourier space.
 	for (int i = 0; i < pow(NGRID,DIM); i++) {
 		
 		// Convert linear index i to DIM-dimensional indices.
 		for (int d = 0; d < DIM; d++) {
-			idx[d] = i % (int)pow(NGRID,d);
+			idx[d] = i % (int)pow(NGRID,d+1);
 		
 			// Convert to fourier frequency indices.
 			if (idx[d] >= NGRID/2) {
@@ -271,7 +271,7 @@ int main(int argc, char **argv) {
 		if (k2 == 0) {
 			greens_kspace[i][0] = 0; // Set zero-frequency to 0.
 		} else {
-			greens_kspace[i][0] = -4.0*M_PI/k2;
+			greens_kspace[i][0] = -4.0*M_PI*G/k2;
 		} 
 		greens_kspace[i][1] = 0;	// Imaginary part.
 	}
@@ -280,16 +280,37 @@ int main(int argc, char **argv) {
 	calc_density(p, density_real, NP, h); 
 	
 	// Print density field to a file. (DEBUGGING)
-	fprint_density(density_real);
+	char densitystr[] = "density";
+	fprint_realfield(density_real, densitystr);
 	
 	// Forward Fourier transform of the density field. (2D ONLY HERE)
 	fftw_execute(plan_forward);
 	
-	
 	// Multiply density field with green's function in kspace.
+	double d_rel, d_img, g_rel, g_img;
+	for (int i = 0; i < pow(NGRID,DIM); i++) {
+	
+		d_rel = density_kspace[i][0];
+		d_img = density_kspace[i][1];
+		g_rel = greens_kspace[i][0];
+		g_img = greens_kspace[i][1];
+		
+		// Complex multiplication.	
+		density_kspace[i][0] = d_rel*g_rel - d_img*g_img; // Real
+		density_kspace[i][1] =	d_rel*g_img + d_img*g_rel; // Img
+	}
 	
 	// Backwards Fourier transform to obtain the potential field.
 	fftw_execute(plan_backward);
+	
+	// Normalize the potential manually after the FFT.
+	for (int i = 0; i < pow(NGRID,DIM); i++) {
+		pot_real[i][0] /= pow(NGRID,DIM);	
+	}
+	
+	// Print potential field to a file. (DEBUGGING)
+	char potstr[] = "potential";
+	fprint_realfield(pot_real, potstr);
 	
 	
 	// OTHER THINGS LATER
