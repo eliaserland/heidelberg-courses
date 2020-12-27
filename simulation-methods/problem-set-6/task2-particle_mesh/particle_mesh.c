@@ -11,7 +11,7 @@
 #define M_PI 3.14159265358979323846
 
 #define DIM 2		// No. of dimensions (ONLY WORKING IN 2D FOR NOW)
-#define NGRID 512	// No. of gridpoints per dimension
+#define NGRID 64	// No. of gridpoints per dimension
 
 /*
  * 	Fundamentals of Simulation Methods - WiSe 2020/2021
@@ -197,7 +197,7 @@ void calc_density(particle *p, fftw_complex *density, int NP, double h) {
 
 			/* Assign to the density field, the mass fraction for the
 			   particle at the current gridpoint. */			
-			density[lin_idx][0] = p[i].m / v * W[j];  	// Real part.
+			density[lin_idx][0] = p[i].m * W[j] / v;  	// Real part.
 			density[lin_idx][1] = 0; 		 	// Imaginary part.
 		}
 	}
@@ -250,7 +250,7 @@ int main(int argc, char **argv) {
 		
 		// Convert linear index i to DIM-dimensional indices.
 		for (int d = 0; d < DIM; d++) {
-			idx[d] = i % (int)pow(NGRID,d+1);
+			idx[d] =  (int)floor(i/pow(NGRID,d)) % NGRID;
 		
 			// Convert to fourier frequency indices.
 			if (idx[d] >= NGRID/2) {
