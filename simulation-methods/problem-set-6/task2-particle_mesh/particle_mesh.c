@@ -11,7 +11,7 @@
 #define M_PI 3.14159265358979323846
 
 #define DIM 2		// No. of dimensions (ONLY WORKING IN 2D FOR NOW)
-#define NGRID 64	// No. of gridpoints per dimension
+#define NGRID 128	// No. of gridpoints per dimension
 
 /*
  * 	Fundamentals of Simulation Methods - WiSe 2020/2021
@@ -93,8 +93,10 @@ void print_pos(particle *p, int NP) {
 
 /** 
  * fprint_realfield() - Print real part of a field to a file. (Density, Potential...)
- * 
- * @density: Pointer to the field.
+ * 			 Prints flattened matrix for DIM>2.
+ *
+ * @field: Pointer to the field.
+ * @fieldname: Null-terminated string containing name of the field.
  *
  * Returns: Nothing.   
  */
@@ -107,10 +109,36 @@ void fprint_realfield(fftw_complex *field, char *fieldname) {
 	
 	for (int i = 0; i < pow(NGRID,DIM); i++) {
 		fprintf(fd, "%lf ", field[i][0]);	// Print the real part.
-		if (i%NGRID == NGRID-1) {
+		if (i%NGRID == NGRID-1 && DIM <= 2) {
 			fprintf(fd, "\n");
 		}		
 	}
+	fclose(fd);
+}
+
+/** 
+ * fprint_acc() - Print acceleration field to a file. Prints flattened matrix 
+ *		  for DIM>2.
+ * 
+ * @field: Pointer to the field.
+ * @fieldname: Null-terminated string containing name of the field.
+ *
+ * Returns: Nothing.   
+ */
+void fprint_acc(double *acc, char *fieldname) {
+	
+	// Create an output file.
+	char fname[100];
+	sprintf(fname, "output_%s.txt", fieldname);
+	FILE *fd = fopen(fname, "w");
+	
+	for (int i = 0; i < pow(NGRID,DIM); i++) {
+		fprintf(fd, "%lf ", acc[i]);
+		if (i%NGRID == NGRID-1 && DIM <= 2)  {
+			fprintf(fd, "\n");
+		}		
+	}
+	fclose(fd);
 }
 
 /**
@@ -211,12 +239,13 @@ void calc_density(particle *p, fftw_complex *density, int NP, double h) {
 int main(int argc, char **argv) {
 
 	/* Simulation settings */
-	const int NP = 1;		// No. of particles to simulate.
-	const double L = 1; 		// Box side length.
-	const double G = 1;		// Newton's gravity constant.
+	const int NP = 1;		 // No. of particles to simulate.
+	const double L = 1; 		 // Box side length.
+	const double G = 1;		 // Newton's gravity constant.
 	
 	// -------------------------------------------------
-	const double h = L/NGRID; 	// Grid spacing. 
+	const double h = L/NGRID; 	 // Grid spacing.
+	const int Ng = pow(NGRID, DIM); // Total number of gridpoints.  
 	
 	// Declare and seed the RNG used for the particle initialization.
 	pcg32_random_t rngptr;
@@ -232,10 +261,10 @@ int main(int argc, char **argv) {
 	print_pos(p, NP);
 
 	// Allocations.
-	fftw_complex *density_real   = fftw_malloc(pow(NGRID,DIM) * sizeof(fftw_complex));
-	fftw_complex *density_kspace = fftw_malloc(pow(NGRID,DIM) * sizeof(fftw_complex));
-	fftw_complex *greens_kspace  = fftw_malloc(pow(NGRID,DIM) * sizeof(fftw_complex));
-	fftw_complex *pot_real	      = fftw_malloc(pow(NGRID,DIM) * sizeof(fftw_complex));
+	fftw_complex *density_real   = fftw_malloc(Ng * sizeof(fftw_complex));
+	fftw_complex *density_kspace = fftw_malloc(Ng * sizeof(fftw_complex));
+	fftw_complex *greens_kspace  = fftw_malloc(Ng * sizeof(fftw_complex));
+	fftw_complex *pot_real	      = fftw_malloc(Ng * sizeof(fftw_complex));
 
 	// Create FFTW plans for forward and backwards transformations.
 	fftw_plan plan_forward = fftw_plan_dft_2d(NGRID, NGRID, density_real, density_kspace,
@@ -246,7 +275,7 @@ int main(int argc, char **argv) {
 	// Set up the Green's function in Fourier space.
 	int idx[DIM]; 
 	double k2, l2;
-	for (int i = 0; i < pow(NGRID,DIM); i++) {
+	for (int i = 0; i < Ng; i++) {
 		
 		// Convert linear index i to DIM-dimensional indices.
 		for (int d = 0; d < DIM; d++) {
@@ -288,7 +317,7 @@ int main(int argc, char **argv) {
 	
 	// Multiply density field with green's function in kspace.
 	double d_rel, d_img, g_rel, g_img;
-	for (int i = 0; i < pow(NGRID,DIM); i++) {
+	for (int i = 0; i < Ng; i++) {
 	
 		d_rel = density_kspace[i][0];
 		d_img = density_kspace[i][1];
@@ -304,13 +333,58 @@ int main(int argc, char **argv) {
 	fftw_execute(plan_backward);
 	
 	// Normalize the potential manually after the FFT.
-	for (int i = 0; i < pow(NGRID,DIM); i++) {
-		pot_real[i][0] /= pow(NGRID,DIM);	
+	for (int i = 0; i < Ng; i++) {
+		pot_real[i][0] /= Ng;	
 	}
 	
 	// Print potential field to a file. (DEBUGGING)
 	char potstr[] = "potential";
 	fprint_realfield(pot_real, potstr);
+	
+	// Get force field (acceleration field on the grid points).
+	
+	// Allocate force field (One component in each dimension).
+	double *acc = malloc(DIM * Ng * sizeof(double));
+	
+	int idx_d, i_plus, i_minus;
+	
+	// For each component of the force field: 
+	for (int d = 0; d < DIM; d++) {
+		// For each gridpoint:
+		for (int i = 0; i < Ng; i++) {
+			
+			// Index for gridpoint in current dimension.
+			idx_d = (i/(int)pow(NGRID,d)) % NGRID;
+			
+			// Check if gridpoint is on the box edge in current dimension.
+			if (idx_d == 0) {
+				// Minusone loop around
+				i_minus = i + (int)(NGRID-1)*pow(NGRID,d);
+			} else {
+				i_minus = i - (int)pow(NGRID,d);
+			}
+			if (idx_d == NGRID-1) {
+				// Plusone loop around
+				i_plus = i - (int)(NGRID-1)*pow(NGRID,d);
+			} else {
+				i_plus = i + (int)pow(NGRID,d);
+			}
+			
+			// Finite differecing to obtain force field estimate.
+			acc[d*Ng+i] = -(pot_real[i+i_plus][0] - pot_real[i+i_minus][0])/(2.0*h);
+//			acc[d*Ng+i] = -(pot_real[i][0])/(2.0*h);
+		}
+	}
+	
+	// Print each component of the force field to separate files. (DEBUGGING)
+	char accstr[10];
+	
+	strcpy(accstr, "acc_x");		
+	fprint_acc(&acc[0], accstr);
+	
+	strcpy(accstr, "acc_y");	
+	fprint_acc(&acc[Ng], accstr);
+	
 	
 	
 	// OTHER THINGS LATER
@@ -318,6 +392,7 @@ int main(int argc, char **argv) {
 		
 	// Free all dynamically allocated memory.
  	free(p);
+ 	free(acc);
  	
  	fftw_destroy_plan(plan_forward);
 	fftw_destroy_plan(plan_backward);

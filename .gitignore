@@ -13,3 +13,5 @@ simulation-methods/problem-set-6/smooth_image
 simulation-methods/problem-set-6/task2-particle_mesh/particle_mesh
 simulation-methods/problem-set-6/task2-particle_mesh/output_potential.txt
 simulation-methods/problem-set-6/task2-particle_mesh/output_density.txt
+simulation-methods/problem-set-6/task2-particle_mesh/output_acc_x.txt
+simulation-methods/problem-set-6/task2-particle_mesh/output_acc_y.txt

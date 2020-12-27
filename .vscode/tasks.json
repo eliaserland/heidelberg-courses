@@ -13,7 +13,9 @@
                                 "-lm",
                                 "-I/home/elias/Documents/fftw-3.3.9/include",
                                 "-L/home/elias/Documents/fftw-3.3.9/lib",
-                                "-lfftw3"
+                                "-lfftw3",
+                                "-I/home/elias/Documents/pcg-c-basic-master",
+                                "/home/elias/Documents/pcg-c-basic-master/pcg_basic.o"
                         ],
                         "presentation": {
                                 "clear": true
