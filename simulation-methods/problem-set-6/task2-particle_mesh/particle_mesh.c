@@ -133,7 +133,8 @@ void fprint_acc(double *acc, char *fieldname) {
 	FILE *fd = fopen(fname, "w");
 	
 	for (int i = 0; i < pow(NGRID,DIM); i++) {
-		fprintf(fd, "%lf ", acc[i]);
+		//fprintf(fd, "%lf ", acc[i]);
+		fprintf(fd, "%lf ", *(acc+i));
 		if (i%NGRID == NGRID-1 && DIM <= 2)  {
 			fprintf(fd, "\n");
 		}		
@@ -371,8 +372,7 @@ int main(int argc, char **argv) {
 			}
 			
 			// Finite differecing to obtain force field estimate.
-			acc[d*Ng+i] = -(pot_real[i+i_plus][0] - pot_real[i+i_minus][0])/(2.0*h);
-//			acc[d*Ng+i] = -(pot_real[i][0])/(2.0*h);
+			acc[d*Ng+i] = -(pot_real[i_plus][0] - pot_real[i_minus][0])/(2.0*h);
 		}
 	}
 	
