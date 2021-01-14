@@ -1,0 +1,47 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐                                                                                                          
+│                                     Feedback to Exercise 03                                      │                                                                                                          
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘                                                                                                          
+                Handed in as: Catherine-Knobloch_Elias-Olofsson_Julia-Siegl_ex03.zip                                                                                                                          
+                                                                                                                                                                                                              
+                            Great, thanks for naming the file correctly.                                                                                                                                      
+                                                                                                                                                                                                              
+                          This feedback is for:                                                                                                                                                               
+                          • Catherine Knobloch (cknobloch1998@gmail.com)                                                                                                                                      
+                          • Elias Olofsson (ub253@stud.uni-heidelberg.de)                                                                                                                                     
+                          • Julia Siegl (Siegl@stud.uni-heidelberg.de)                                                                                                                                        
+                                                 
+                                                                                                                                                            
+                                 E 1 (24.0) │ E 2 (8.0) │ ∑ (32.0)                                                                                                                                            
+                                 ───────────┼───────────┼─────────                                                                                                                                            
+                                    10.0    │    7.0    │   17.0                                                                                                                                              
+                                                 
+                                                                                                                                                            
+Exercise  1                                                                            [10.0 / 24.0]                                                                                                          
+────────────────────────────────────────────────────────────────────────────────────────────────────                                                                                                          
+3.1:                                                                                                                                                                                                          
+Your cross-feedback students are picky, but right: Your eq. (1) is an optimisation problem on the rhs and a definition of \hat w, \hat b on the lhs.                                                          
+Derivation is correct, thanks for using Latex!                                                                                                                                                                
+                                                                                                                                                                                                              
+3.2:                                                                                                                                                                                                          
+(53) to (54)?                                                                                                                                                                                                 
+Otherwise correct.                                                                                                                                                                                            
+                                                                                                                                                                                                              
+3.3:                                                                                                                                                                                                          
+[@-4] The idea was to insert the definition of S_B.                                                                                                                                                           
+                                                                                                                                                                                                              
+                                                                                                                                                                                                              
+Unfortunately, I have to deduct [@-10] for not providing a commented version, you just submitted the original PDF (as far as I can see). Convince me that you did it and you get 10 points back, or ignore me.
+                                                                                                                                                                                                              
+                                                                                                                                                                                                              
+Exercise  2                                                                              [7.0 / 8.0]                                                                                                          
+────────────────────────────────────────────────────────────────────────────────────────────────────                                                                                                          
+[@-1] Rather use a grayscale colormap here.                                                                                                                                                                   
+[@-1] The problem is not necessarily the lack of data, but the variance within which can not be fully captured by QDA. [@+1] You thought about this yourself.                                                 
+                                                                                                                                                                                                              
+                                                                                                                                                                                                              
+
+                                                                                                                                                                                                             
+════════════════════════════════════════════════════════════════════════════════════════════════════                                                                                                          
+This feedback was created by Felix (Felix Draxler).                                                                                                                                                           
+Please ask questions about the feedback to (felix.draxler@iwr.uni-heidelberg.de)                                                                                                                              
+or on Discord via the private chat.                                                                                                                                                                           
