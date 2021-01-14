@@ -12,38 +12,31 @@
  
 typedef struct particle_data
 {
-  double pos[3];
-  double mass;
-
-  double acc_tree[3];
-  double acc_exact[3];
-}
-  particle;
-
+	double pos[3];
+ 	double mass;
+	double acc_tree[3];
+	double acc_exact[3];
+} particle;
 
 typedef struct node_data
 {
-  double center[3];
-  double len;
- 
-  double cm[3];
-  double mass;
-
-  struct node_data *children[8];
-
-  particle *p;
-}
-  node;
+	double center[3];
+	double len; 
+	double cm[3];
+	double mass;
+	struct node_data *children[8];
+	particle *p;
+} node;
 
 
-#define  MAX_POINTS               5000      /* this sets the particle number that is used */
-static double opening_threshold = 0.8;      /* tree opening angle */
-static double eps               = 0.001;    /* gravitational softening length */
+#define MAX_POINTS 5000      			/* this sets the particle number that is used */
+static double opening_threshold = 0.8;      	/* tree opening angle */
+static double eps               = 0.001;    	/* gravitational softening length */
 
 
 /* Lets create, for simplicity, some static arrays which will hold our data */
 
-#define  MAX_NODES    (5 * MAX_POINTS)
+#define MAX_NODES (5 * MAX_POINTS)
 
 node      tree[MAX_NODES];
 particle  star[MAX_POINTS];
@@ -53,21 +46,18 @@ particle  star[MAX_POINTS];
  */
 node *get_empty_node(void)
 {
-  node *no;
-  static int count_nodes = 0;
+	node *no;
+	static int count_nodes = 0;
 
-  if(count_nodes < MAX_NODES)
-    {
-      no = &tree[count_nodes++];
-      memset(no, 0, sizeof(node));
-    }
-  else
-    {
-      printf("sorry, we are out of tree nodes.\n");
-      exit(1);
-    }
+	if (count_nodes < MAX_NODES) {
+		no = &tree[count_nodes++];
+		memset(no, 0, sizeof(node));
+	} else {
+		printf("sorry, we are out of tree nodes.\n");
+		exit(1);
+	}
 
-  return no;
+	return no;
 }
 
 
@@ -76,16 +66,18 @@ node *get_empty_node(void)
  */
 int get_subnode_index(node *current, particle *p)
 {
-  int index = 0;
+	int index = 0;
 
-  if(p->pos[0] > current->center[0])
-    index += 4;
-  if(p->pos[1] > current->center[1])
-    index += 2;
-  if(p->pos[2] > current->center[2])
-    index += 1;
-
-  return index;
+	if (p->pos[0] > current->center[0]) {
+		index += 4;
+	}	
+	if (p->pos[1] > current->center[1]) {
+		index += 2;
+	}	
+	if (p->pos[2] > current->center[2]) {
+		index += 1;
+	}	
+	return index;
 }
 
 
@@ -93,51 +85,51 @@ int get_subnode_index(node *current, particle *p)
  */
 void insert_particle(node *current, particle *pnew)
 {
-  node *child;
-  int i, j, k, n, p_subnode, pnew_subnode;
+	node *child;
+	int i, j, k, n, p_subnode, pnew_subnode;
 
-  if(current->p)
-    {
-      /* The node contains a particle already. 
-	 Need to create a new set of 8 subnodes, and then move this particle to one of them */
+	if (current->p) {
+	      /* The node contains a particle already. 
+		 Need to create a new set of 8 subnodes, and then move this particle to one of them */
 
-      for(i = 0, n = 0; i<2; i++)
-	for(j=0; j<2; j++)
-	  for(k=0; k<2; k++)
-	    {
-	      child = get_empty_node();
-	      current->children[n++] = child;
-	      child->len = 0.5 * current->len;
-	      child->center[0] = current->center[0] + 0.25 * (2*i-1) * current->len;
-	      child->center[1] = current->center[1] + 0.25 * (2*j-1) * current->len;
-	      child->center[2] = current->center[2] + 0.25 * (2*k-1) * current->len;
-	    }
+		for (i = 0, n = 0; i<2; i++) {
+			for (j=0; j<2; j++) {
+				for (k=0; k<2; k++) {
+					child = get_empty_node();
+					current->children[n++] = child;
+					child->len = 0.5 * current->len;
+					child->center[0] = current->center[0] + 0.25 * (2*i-1) * current->len;
+					child->center[1] = current->center[1] + 0.25 * (2*j-1) * current->len;
+					child->center[2] = current->center[2] + 0.25 * (2*k-1) * current->len;
+				}
+			}
+		}
 
-      /* determine in which subnode the old particle sits */
-      p_subnode = get_subnode_index(current, current->p);
-      
-      /* now move the particle to this subnode */
-      current->children[p_subnode]->p = current->p;
-      current->p = NULL;
+		/* determine in which subnode the old particle sits */
+		p_subnode = get_subnode_index(current, current->p);
 
-      /* determine in which subnode the new particle sits */
-      pnew_subnode = get_subnode_index(current, pnew);
-      
-      /* now try to insert the new particle there */
-      insert_particle(current->children[pnew_subnode], pnew);
-    }
-  else
-    {
-      /* check in which subnode the new particle would fall */
-      pnew_subnode = get_subnode_index(current, pnew);
-      
-      /* if the corresponding subnode exists, we try to insert the particle there,
-	 otherwise we know there are no subnodes in the node, so we can put the particle into the current node */
-      if(current->children[pnew_subnode])
-	insert_particle(current->children[pnew_subnode], pnew);
-      else
-	current->p = pnew;
-    }
+		/* now move the particle to this subnode */
+		current->children[p_subnode]->p = current->p;
+		current->p = NULL;
+
+		/* determine in which subnode the new particle sits */
+		pnew_subnode = get_subnode_index(current, pnew);
+
+		/* now try to insert the new particle there */
+		insert_particle(current->children[pnew_subnode], pnew);
+	
+	} else {
+	
+	      /* check in which subnode the new particle would fall */
+	      pnew_subnode = get_subnode_index(current, pnew);
+	      
+	      /* if the corresponding subnode exists, we try to insert the particle there,
+		 otherwise we know there are no subnodes in the node, so we can put the particle into the current node */
+	      if(current->children[pnew_subnode])
+		insert_particle(current->children[pnew_subnode], pnew);
+	      else
+		current->p = pnew;
+	}
 }
 
 
