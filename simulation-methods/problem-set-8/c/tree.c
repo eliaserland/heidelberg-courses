@@ -68,10 +68,10 @@ int get_subnode_index(node *current, particle *p)
 {
 	int index = 0;
 
-	if (p->pos[0] > current->center[0]) {
+	if (p->pos[0] > current->center[0]) {  	// if: x-pos > center_x 
 		index += 4;
 	}	
-	if (p->pos[1] > current->center[1]) {
+	if (p->pos[1] > current->center[1]) { 
 		index += 2;
 	}	
 	if (p->pos[2] > current->center[2]) {
