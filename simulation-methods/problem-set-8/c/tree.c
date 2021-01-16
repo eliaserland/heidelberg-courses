@@ -275,13 +275,13 @@ void walk_tree(node *current, double pos[3], double acc[3])
 		 * NOTE: Avoid self-attraction of a particle. */
 		if (theta < opening_threshold || current->p) {
 			
+			/**/ 
 			
 			
 			
-			
-			
-			
-			
+			acc[0] += 
+			acc[1] += 
+			acc[2] += 
 			
 			/*
 			 * ..... TO BE FILLED IN ....
