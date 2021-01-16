@@ -162,17 +162,22 @@ void insert_particle(node *current, particle *pnew)
 	}
 }
 
-
-/* This function recursively calculates the multipole moments for the current node.
- * We only use monopoles here.
- */
+/**
+ * calc_multipole_moments() - Calculate the multipole moments for the current node.
+ * @current: Pointer to the node in question.
+ *
+ * Recursively calculates the moments of the multipole expansion of the current
+ * node. (Only monopole moments in this case.)
+ *
+ * Returns: Nothing.
+ */ 
 void calc_multipole_moments(node *current)
 {
 	int n, j;
 
-	/* do we have subnodes? */
+	/* Do we have subnodes? */
 	if(current->children[0]) {
-		/* yes, so let's first calculate their multipole moments */
+		/* Yes, so let's first calculate their multipole moments */
 		for(n = 0; n < 8; n++) {
 			calc_multipole_moments(current->children[n]);
 		}
@@ -208,21 +213,37 @@ void calc_multipole_moments(node *current)
 	}
 }
 
-
+/**
+ * get_opening_angle() - Calculate the opening angle for the current node from 
+ *			  the given position.
+ * @current:	Pointer to the node in question.
+ * @pos: 	Position of the reference point.
+ *		 
+ * Approximates the opening angle theta as the fraction l/r, where l is the 
+ * length of the current node and r is the distance from the reference point to 
+ * the center of mass of the node.
+ *
+ * Returns: The opening angle.
+ */
 double get_opening_angle(node *current, double pos[3])
 {
-	int j;
 	double r2 = 0;
 
-	for(j = 0; j < 3; j++) {
+	for(int j = 0; j < 3; j++) {
 		r2 += (current->cm[j] - pos[j]) * (current->cm[j] - pos[j]);
 	}
 	
 	return current->len / (sqrt(r2) + 1.0e-35);
 }
 
-
-
+/**
+ * walk_tree() - 
+ * @current: 	Pointer to the node in question.
+ * @pos: 	
+ * @acc:
+ *
+ * Returns: Nothing.
+ */
 void walk_tree(node *current, double pos[3], double acc[3])
 {
 	int n;
