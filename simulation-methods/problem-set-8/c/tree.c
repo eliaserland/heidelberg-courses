@@ -174,39 +174,51 @@ void insert_particle(node *current, particle *pnew)
 void calc_multipole_moments(node *current)
 {
 	int n, j;
+	node *child;
 
 	/* Do we have subnodes? */
 	if(current->children[0]) {
-		/* Yes, so let's first calculate their multipole moments */
-		for(n = 0; n < 8; n++) {
+		/* Yes, so let's first calculate their multipole moments. */
+		for (n = 0; n < 8; n++) {
 			calc_multipole_moments(current->children[n]);
 		}
 		
-		/* initialize the node multipole moments to zero */
+		/* Initialize the node multipole moments to zero. */
 		current->mass  = 0;
-		for(j = 0; j < 3; j++) {
+		for (j = 0; j < 3; j++) {
 			current->cm[j] = 0;
 		}
 		
-		/* now calculate the moment of the current node from those of its children */
+		/* Now calculate the moment of the current node from those of its children */
 		
-		/*
-		* ..... TO BE FILLED IN ....
-		*/
+		/* Monopole moment: 
+		   For each of the children, sum up the total mass from the 
+		   children and the calculate the combined center of mass. */
+		for (n = 0; n < 8; n++) {
+			child = current->children[n];
+			current->mass += child->mass;
+			for (j = 0; j < 3; j++) {
+				current->cm[j] += child->mass * child->cm[j];
+			} 
+		}		
+		// Normalize the weighted average for the combined center of mass.
+		for (j = 0; j < 3; j++) {
+			current->cm[j] /= current->mass
+		}
 	
 	} else {
 	
-		/* do we at least have a particle? */
-		if(current->p) {
-			/* yes, so let's copy this particle to the multipole moments of the node */
+		/* Do we at least have a particle? */
+		if (current->p) {
+			/* Yes, so let's copy this particle to the multipole moments of the node. */
 			current->mass = current->p->mass;
-			for(j = 0; j < 3; j++) {
+			for (j = 0; j < 3; j++) {
 				current->cm[j] = current->p->pos[j];
 			}	
 		} else {
-			/* nothing in here at all; let's initialize the multipole moments to zero */
+			/* Nothing in here at all; let's initialize the multipole moments to zero. */
 			current->mass  = 0;
-			for(j = 0; j < 3; j++) {
+			for (j = 0; j < 3; j++) {
 				current->cm[j] = 0;
 			}
 		}
@@ -237,10 +249,14 @@ double get_opening_angle(node *current, double pos[3])
 }
 
 /**
- * walk_tree() - 
+ * walk_tree() - Calculate the acceleration at a reference point, resulting from 
+ *		  the particles in the given node. 
  * @current: 	Pointer to the node in question.
- * @pos: 	
- * @acc:
+ * @pos: 	Position of the reference point.
+ * @acc:	Total acceleration at the reference point.
+ *
+ * Walk the tree and recursively sum up all contributions to the acceleration at
+ * the reference point, due to the particles contained in the current node. 
  *
  * Returns: Nothing.
  */
@@ -249,16 +265,24 @@ void walk_tree(node *current, double pos[3], double acc[3])
 	int n;
 	double theta;
 
-	/* only do something if there is mass in this branch of the tree (i.e. if it is not empty) */
+	/* Only do something if there is mass in this branch of the tree (i.e. if it is not empty). */
 	if(current->mass) {
 		
 		theta = get_opening_angle(current, pos);
 
-		/* if the node is seen under a small enough angle or contains a single particle,
-		* we take its multipole expansion, and we're done for this branch 
-		* NOTE: Avoid self-attraction of a particle
-		*/
-		if(theta < opening_threshold || current->p) {
+		/* If the node is seen under a small enough angle or contains a single particle,
+		 * we take its multipole expansion, and we're done for this branch.
+		 * NOTE: Avoid self-attraction of a particle. */
+		if (theta < opening_threshold || current->p) {
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			/*
 			 * ..... TO BE FILLED IN ....
 			 *
@@ -267,11 +291,11 @@ void walk_tree(node *current, double pos[3], double acc[3])
 			 *     acc[2] += ....
 			 */
 		} else {
-			/* otherwise we have to open the node and look at all daughter nodes in turn */
+			/* Otherwise we have to open the node and look at all children nodes in turn */
 
-			/* make sure that we actually have subnodes */
-			if(current->children[0]) {             
-				for(n=0; n<8; n++) {
+			/* Make sure that we actually have subnodes. */
+			if (current->children[0]) {             
+				for (n = 0; n < 8; n++) {
 					walk_tree(current->children[n], pos, acc);
 				}
 			}
@@ -283,60 +307,60 @@ void walk_tree(node *current, double pos[3], double acc[3])
 
 int main(int argc, char **argv)
 {
-	node *root;
-	int i, j, N;
-	double t0, t1;
+	double t0, t1;			// Start/stop times.
+	const int N = MAX_POINTS; 	// Number of particles in the simulation.
+	
+	srand48(42);			// Set a random number seed
 
-	N = MAX_POINTS;
-
-	srand48(42);   /* set a random number seed */
-
-	/* create a random particle set, uniformly distributed in a box */
-	for(i=0; i < N; i++) {
+	/* Create a random particle set, uniformly distributed in a box of unit 
+	   sidelength. Total mass of the N particles is unity. */
+	for (int i = 0; i < N; i++) {
 		star[i].mass = 1.0 / N;
-
-		for(j=0; j<3; j++) {
+		for (int j = 0; j < 3; j++) {
 			star[i].pos[j] = drand48();      
 		}
 	}
 
-	/* create an empty root node for the tree */
-	root = get_empty_node();
+	/* Create an empty root node for the tree. */
+	node *root = get_empty_node();
 
-	/* set the dimension and position of the root node */
+	/* Set the dimension and position of the root node. */
 	root->len = 1.0;
-	for(j=0; j<3; j++) {
+	for(int j = 0; j < 3; j++) {
 		root->center[j] = 0.5;
 	}
 
-	/* insert the particles into the tree */
-	for(i=0; i < N; i++) {
+	/* Insert the particles into the tree. */
+	for (int i = 0; i < N; i++) {
 		insert_particle(root, &star[i]);
 	}
 	
-	/* calculate the multipole moments */
+	/* Calculate the multipole moments. */
 	calc_multipole_moments(root);
 
 
-	/* set a timer */
+	/* Start the timer. */
 	t0 = (double) clock();
 
-	/* now calculate the accelerations with the tree */
-	for(i = 0; i < N; i++) {
-		for(j = 0; j < 3; j++) {
+	/* Calculate the accelerations with the tree algorithm. */
+	for (int i = 0; i < N; i++) {
+		// Set accelerations to zero.
+		for (int j = 0; j < 3; j++) {
 			star[i].acc_tree[j] = 0;
 		}
+		// Calculate the acceleration for the current particle.
 		walk_tree(root, star[i].pos, star[i].acc_tree);
 	}
 
+	/* Stop the timer. */
 	t1 = (double) clock();
-	printf("\nforce calculation with tree took:        %8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
+	printf("\nForce calculation with tree took:        %8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
 
-
+	/* Start the timer. */
 	t0 = (double) clock();
 
-	/* now calculate the accelerations with direct summation, for comparison */
-	for(i = 0; i < N; i++) {
+	/* Calculate the accelerations with direct summation, for comparison. */
+	for(int i = 0; i < N; i++) {
 		
 		/*
 		 * ..... TO BE FILLED IN ....
@@ -346,12 +370,14 @@ int main(int argc, char **argv)
 		 *     star[i].acc_exact[0] = ....
    		 */
 	}
-
+	
+	/* Stop the timer. */
 	t1 = (double) clock();
-	printf("\ncalculation with direct summation took:  %8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
+	printf("\nCalculation with direct summation took:  %8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
 
-	/* now do the calculation of the mean relative error 
-	*/
+
+
+	/* Now do the calculation of the mean relative error. */
 
 	double err_sum = 0;
 
@@ -362,7 +388,7 @@ int main(int argc, char **argv)
 
 	err_sum /= N;
 
-	printf("\nAverage relative error:  %8g\n", err_sum);
+	printf("\nAverage relative error:  		    %8g\n", err_sum);
 
 	return 0;
 }
