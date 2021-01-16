@@ -1,3 +1,13 @@
+/*
+ * 	Fundamentals of Simulation Methods - WiSe 2020/2021
+ * 	Problem Set 8 
+ *
+ *	Tree algorithm for gravitational N-body system using hierarchical 
+ *	multiplole expansion.
+ *
+ *   	Author: Elias Olofsson
+ * 	Date: 2021-01-20
+ */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -6,10 +16,14 @@
 #include <math.h>
 #include <time.h>
 
+#define MAX_POINTS 5000      			/* Max no. of particles used. */
+#define MAX_NODES (5 * MAX_POINTS)		/* Max no. of nodes in tree.  */
 
-/* Let's define two types of structures, one for the particles, one for the tree nodes
- */
- 
+static double opening_threshold = 0.8;      	/* Tree opening angle. */
+static double eps               = 0.001;    	/* Gravitational softening length. */
+
+/* Let's define two types of structures, one for the particles, 
+   one for the tree nodes */
 typedef struct particle_data
 {
 	double pos[3];
@@ -28,21 +42,14 @@ typedef struct node_data
 	particle *p;
 } node;
 
+/* Lets create, for simplicity, some static global arrays which will hold our data */
+static node      tree[MAX_NODES];
+static particle  star[MAX_POINTS];
 
-#define MAX_POINTS 5000      			/* this sets the particle number that is used */
-static double opening_threshold = 0.8;      	/* tree opening angle */
-static double eps               = 0.001;    	/* gravitational softening length */
-
-
-/* Lets create, for simplicity, some static arrays which will hold our data */
-
-#define MAX_NODES (5 * MAX_POINTS)
-
-node      tree[MAX_NODES];
-particle  star[MAX_POINTS];
-
-
-/* this function returns a pointer to an empty tree node 
+/**
+ * get_empty_node() - Return pointer to an empty tree node.
+ *
+ * Returns: Pointer to an empty node.
  */
 node *get_empty_node(void)
 {
@@ -56,19 +63,27 @@ node *get_empty_node(void)
 		printf("sorry, we are out of tree nodes.\n");
 		exit(1);
 	}
-
 	return no;
 }
 
-
-/* this function determines the index (0-7) of the subnode in which
- * a particle falls within a given node
- */
+/**
+ * get_subnode_index() - Determine subnode index for a particle within a given node.
+ * @current:	Pointer to the node in question.
+ * @p:		Pointer to the particle.
+ *
+ * Determines the subnode index (0-7) in which the given particle falls within 
+ * a given node. Index ordering is in binary enumeration of the octant with + as
+ * 1, big-endian order.
+ *
+ * Returns: Subnode index of the given particle.
+ */ 
 int get_subnode_index(node *current, particle *p)
 {
 	int index = 0;
 
-	if (p->pos[0] > current->center[0]) {  	// if: x-pos > center_x 
+	/* Binary enumeration (xyz) = {000,...,111} of the octant with + as 1, 
+	   big-endian order. */ 
+	if (p->pos[0] > current->center[0]) {  
 		index += 4;
 	}	
 	if (p->pos[1] > current->center[1]) { 
@@ -80,23 +95,36 @@ int get_subnode_index(node *current, particle *p)
 	return index;
 }
 
-
-/* this function's task is to insert a new particle into a given tree node 
- */
+/**
+ * insert_particle() - Insert a particle in the given node of the tree.
+ * @current: 	Pointer to the node in question.
+ * @pnew: 	Pointer to the particle to insert.
+ *
+ * Recursively checks if the current node is containing old particles, and to 
+ * accommodate the new particle, divides the node into octants of subnodes, 
+ * until all nodes each contains a single particle.
+ *
+ * Returns: Nothing.
+ */ 
 void insert_particle(node *current, particle *pnew)
 {
 	node *child;
-	int i, j, k, n, p_subnode, pnew_subnode;
+	int n, p_subnode, pnew_subnode;
 
 	if (current->p) {
 		/* The node contains a particle already. 
 		   Need to create a new set of 8 subnodes, and then move this particle to one of them */
-
-		for (i = 0, n = 0; i<2; i++) {
-			for (j=0; j<2; j++) {
-				for (k=0; k<2; k++) {
+		n = 0
+		for (int i = 0; i < 2; i++) {
+			for (int j = 0; j < 2; j++) {
+				for (int k = 0; k < 2; k++) {
+					// Get pointer to a new empty node.
 					child = get_empty_node();
+					
+					// Insert node as a child to the current node 
 					current->children[n++] = child;
+					
+					// Set length and geometric center of child node.
 					child->len = 0.5 * current->len;
 					child->center[0] = current->center[0] + 0.25 * (2*i-1) * current->len;
 					child->center[1] = current->center[1] + 0.25 * (2*j-1) * current->len;
@@ -105,26 +133,27 @@ void insert_particle(node *current, particle *pnew)
 			}
 		}
 
-		/* determine in which subnode the old particle sits */
+		/* Determine in which subnode the old particle sits. */
 		p_subnode = get_subnode_index(current, current->p);
 
-		/* now move the particle to this subnode */
+		/* Move the old particle to this subnode. */
 		current->children[p_subnode]->p = current->p;
 		current->p = NULL;
 
-		/* determine in which subnode the new particle sits */
+		/* Determine in which subnode the new particle sits. */
 		pnew_subnode = get_subnode_index(current, pnew);
 
-		/* now try to insert the new particle there */
+		/* Try to insert the new particle there. */
 		insert_particle(current->children[pnew_subnode], pnew);
 	
 	} else {
 	
-		/* check in which subnode the new particle would fall */
+		/* The current node does not contain a particle. 
+		   Check in which subnode the new particle would fall in. */
 		pnew_subnode = get_subnode_index(current, pnew);
 
-		/* if the corresponding subnode exists, we try to insert the particle there,
-		 otherwise we know there are no subnodes in the node, so we can put the particle into the current node */
+		/* If the corresponding subnode exists, we try to insert the particle there,
+		   otherwise we know there are no subnodes in the node, so we can put the particle into the current node */
 		if (current->children[pnew_subnode]) {
 			insert_particle(current->children[pnew_subnode], pnew);
 		} else {
