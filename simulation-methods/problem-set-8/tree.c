@@ -8,6 +8,7 @@
  *   	Author: Elias Olofsson
  * 	Date: 2021-01-20
  */
+
 #define _XOPEN_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,37 +17,42 @@
 #include <unistd.h>
 #include <math.h>
 #include <time.h>
+#include <stdbool.h>
 
-#define MAX_POINTS 5000      			/* Default Max no. of particles used. */
-#define MAX_NODES (5 * MAX_POINTS)		/* Deafault Max no. of nodes in tree.  */
+// =========================== Global parameters ==============================
 
-static double opening_threshold = 0.8;      	/* Deafult Tree opening angle. */
-static double eps               = 0.001;    	/* Gravitational softening length. */
-const static double G		 = 1.0; 	/* Newton's gravitational const. */
+static int N = 5000;      		  // Default max no. of particles used. 
+static int MAX_NODES;			  // Max no. of nodes in tree.	 
+
+static double opening_threshold = 0.8;   // Deafult Tree opening angle.       
+const static double eps	 = 0.001; // Gravitational softening length. 	 
+const static double G 		 = 1.0;   // Newton's gravitational const.   	
+
+// ========================== Internal datatypes ==============================
 
 /* Let's define two types of structures, one for the particles, 
    one for the tree nodes */
-typedef struct particle_data
-{
+typedef struct particle {
 	double pos[3];
  	double mass;
 	double acc_tree[3];
 	double acc_exact[3];
 } particle;
 
-typedef struct node_data
-{
+typedef struct node {
 	double center[3];
 	double len; 
 	double cm[3];
 	double mass;
-	struct node_data *children[8];
+	struct node *children[8];
 	particle *p;
 } node;
 
-/* Lets create, for simplicity, some static global arrays which will hold our data */
-static node      tree[MAX_NODES];
-static particle  star[MAX_POINTS];
+// Global pointers to the tree structure, ie arrays of nodes and particles.
+static node     *tree;
+static particle *star;
+
+// ========================== Internal functions ==============================
 
 /**
  * get_empty_node() - Return pointer to an empty tree node.
@@ -318,63 +324,51 @@ void walk_tree(node *current, double pos[3], double acc[3])
 	}
 }
 
-
-
 int main(int argc, char **argv)
 {
-	// Parse all arguments.
 	int opt;
-	
-	bool use_default_N = true;
+	bool use_default_N = true; 
 	bool use_default_t = true;
 	
+	// Parse all arguments.	
 	while((opt = getopt(argc, argv, "n:t:")) != -1) {  
 		switch(opt) {  
             		case 'n':
             		{
-            			const int N = atoi(optarg);  
-                		printf("Number of particles:     %d\n", N);  
+            			N = atoi(optarg);  
+                		printf("Number of particles:     N     = %d\n", N);  
                 		use_default_N = false; 
 				break;
 			}
 			case 't': 
 			{
 				opening_threshold = atof(optarg);
-				printf("Opening angle threshold: %f\n", opening_threshold);  
+				printf("Opening angle threshold: theta = %f\n", opening_threshold);  
 				use_default_t = false;
 				break; 			
 			} 
-			/* 
-		    	case ':':  
-				printf("option needs a value\n");  
-				break;  
-		    	case '?':  
-				printf("unknown option: %c\n", optopt); 
-				break; */ 
         	}  
     	}
-    	
-    	if (!use_default_N && !use_default_t) {
+    	if (use_default_N && use_default_t) {
     		fprintf(stderr, "Usage:\n\t [-n] N [-t] theta \n"
     			"\t where N is an integer, giving the numer of particles, \n"
-    			"\t and theta is the opening angle threshold. \n"); 
-    		exit(EXIT_FAILURE);
-  
+    			"\t and theta is the opening angle threshold. \n\n"); 
     	} 
     	if (use_default_N) {
-    		const int N = MAX_POINTS;
+    		fprintf(stderr, "Using default value:     N     = %d\n", N); 
     	}
     	if (use_default_t) {
-    		const double opening_threshold = 0.8
+    		fprintf(stderr, "Using default value:     theta = %f\n", opening_threshold);
     	}
+    	
+    	
+	MAX_NODES = 5*N;	// Max no. of nodes in tree.
 	
-	
-	
-	
+	/* Dynamically allocate arrays for the tree structure. */
+	tree = calloc(MAX_NODES, sizeof(node));	// Array of tree nodes.
+	star = calloc(N, sizeof(particle));		// Array of particles.
 	
 	double t0, t1;			// Start/stop times.
-	const int N = MAX_POINTS; 	// Number of particles in the simulation.
-	
 	srand48(42);			// Set a random number seed
 
 	/* Create a random particle set, uniformly distributed in a box of unit 
@@ -419,7 +413,7 @@ int main(int argc, char **argv)
 
 	/* Stop the timer. */
 	t1 = (double) clock();
-	printf("\nForce calculation with tree took:        %8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
+	printf("\nForce calculation with tree:         %9.8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
 	 
 	double dx[3], dx2, m;
 	double eps2 = eps * eps;  
@@ -456,22 +450,32 @@ int main(int argc, char **argv)
 	
 	/* Stop the timer. */
 	t1 = (double) clock();
-	printf("\nCalculation with direct summation took:  %8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
-
-
+	printf("\nCalculation with direct summation:   %9.8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
 
 	/* Now do the calculation of the mean relative error. */
-
 	double err_sum = 0;
-
-	/*
-	* ..... TO BE FILLED IN ....
-	*
-	*/
-
+	double diff[3], diff2, dir_acc, tree_acc, direct2;  
+	
+	for (int i = 0; i < N; i++) {
+		diff2   = 0;
+		direct2 = 0;
+		for (int d = 0; d < 3; d++) {
+			dir_acc  = star[i].acc_tree[d]; 
+			tree_acc = star[i].acc_exact[d];
+			
+			diff[d] = dir_acc - tree_acc; 
+			
+			diff2   += diff[d] * diff[d]; 
+			direct2 += dir_acc * dir_acc; 
+		}
+		err_sum += sqrt(diff2) / sqrt(direct2); 
+	}
 	err_sum /= N;
 
-	printf("\nAverage relative error:  		    %8g\n", err_sum);
+	printf("\nAverage relative error:  		 %8g\n", err_sum);
+	
+	free(tree);
+	free(star);
 
 	return 0;
 }
