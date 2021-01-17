@@ -115,7 +115,7 @@ void insert_particle(node *current, particle *pnew)
 	if (current->p) {
 		/* The node contains a particle already. 
 		   Need to create a new set of 8 subnodes, and then move this particle to one of them */
-		n = 0
+		n = 0;
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
 				for (int k = 0; k < 2; k++) {
