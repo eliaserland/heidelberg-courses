@@ -17,10 +17,10 @@
 #include <math.h>
 #include <time.h>
 
-#define MAX_POINTS 5000      			/* Max no. of particles used. */
-#define MAX_NODES (5 * MAX_POINTS)		/* Max no. of nodes in tree.  */
+#define MAX_POINTS 5000      			/* Default Max no. of particles used. */
+#define MAX_NODES (5 * MAX_POINTS)		/* Deafault Max no. of nodes in tree.  */
 
-static double opening_threshold = 0.8;      	/* Tree opening angle. */
+static double opening_threshold = 0.8;      	/* Deafult Tree opening angle. */
 static double eps               = 0.001;    	/* Gravitational softening length. */
 const static double G		 = 1.0; 	/* Newton's gravitational const. */
 
@@ -322,11 +322,58 @@ void walk_tree(node *current, double pos[3], double acc[3])
 
 int main(int argc, char **argv)
 {
+	// Parse all arguments.
+	int opt;
+	
+	bool use_default_N = true;
+	bool use_default_t = true;
+	
+	while((opt = getopt(argc, argv, "n:t:")) != -1) {  
+		switch(opt) {  
+            		case 'n':
+            		{
+            			const int N = atoi(optarg);  
+                		printf("Number of particles:     %d\n", N);  
+                		use_default_N = false; 
+				break;
+			}
+			case 't': 
+			{
+				opening_threshold = atof(optarg);
+				printf("Opening angle threshold: %f\n", opening_threshold);  
+				use_default_t = false;
+				break; 			
+			} 
+			/* 
+		    	case ':':  
+				printf("option needs a value\n");  
+				break;  
+		    	case '?':  
+				printf("unknown option: %c\n", optopt); 
+				break; */ 
+        	}  
+    	}
+    	
+    	if (!use_default_N && !use_default_t) {
+    		fprintf(stderr, "Usage:\n\t [-n] N [-t] theta \n"
+    			"\t where N is an integer, giving the numer of particles, \n"
+    			"\t and theta is the opening angle threshold. \n"); 
+    		exit(EXIT_FAILURE);
+  
+    	} 
+    	if (use_default_N) {
+    		const int N = MAX_POINTS;
+    	}
+    	if (use_default_t) {
+    		const double opening_threshold = 0.8
+    	}
+	
+	
+	
+	
+	
 	double t0, t1;			// Start/stop times.
 	const int N = MAX_POINTS; 	// Number of particles in the simulation.
-	
-	
-	
 	
 	srand48(42);			// Set a random number seed
 
