@@ -21,6 +21,7 @@
 
 static double opening_threshold = 0.8;      	/* Tree opening angle. */
 static double eps               = 0.001;    	/* Gravitational softening length. */
+const static double G		 = 1.0; 	/* Newton's gravitational const. */
 
 /* Let's define two types of structures, one for the particles, 
    one for the tree nodes */
@@ -190,7 +191,7 @@ void calc_multipole_moments(node *current)
 		}
 		
 		/* Now calculate the moment of the current node from those of its children */
-		
+		//--------------------------------------------------------------
 		/* Monopole moment: 
 		   For each of the children, sum up the total mass from the 
 		   children and the calculate the combined center of mass. */
@@ -205,6 +206,9 @@ void calc_multipole_moments(node *current)
 		for (j = 0; j < 3; j++) {
 			current->cm[j] /= current->mass
 		}
+		//--------------------------------------------------------------
+		/* Quadrupole moment (Optional)*/
+		
 	
 	} else {
 	
@@ -264,6 +268,7 @@ void walk_tree(node *current, double pos[3], double acc[3])
 {
 	int n;
 	double theta;
+	double y[3], y1, y2, y3;
 
 	/* Only do something if there is mass in this branch of the tree (i.e. if it is not empty). */
 	if(current->mass) {
@@ -275,21 +280,30 @@ void walk_tree(node *current, double pos[3], double acc[3])
 		 * NOTE: Avoid self-attraction of a particle. */
 		if (theta < opening_threshold || current->p) {
 			
-			/**/ 
+			/* Vector y from CM of node to the reference position. */
+			y2 = 0;
+			for (int j = 0; j < 3; j++) {
+				y[j] = pos[j] - current->cm[j]; 
+				y2 += y[j] * y[j]; 
+			}
+			y1 = sqrt(y2);
 			
-			
-			
-			acc[0] += 
-			acc[1] += 
-			acc[2] += 
-			
-			/*
-			 * ..... TO BE FILLED IN ....
-			 *
-			 *     acc[0] += ....
-			 *     acc[1] += ....
-			 *     acc[2] += ....
-			 */
+			/* Ensure no self-interaction, ie distance to the reference 
+			   point from the node CM is small (~0). */
+			if (y1 > 10e-10) {
+				y3 = y1 * y2; 
+				M = current->mass; // Total mass of node.
+				
+				/* Acceleration from monopole-moments. */
+				for (int i = 0; i < 3; i++) {
+					acc[i] -= G*M*y[i]/y3;
+				}
+				
+				
+				// --------------------
+				// Acceleration from quadrupole moments...
+				
+			}
 		} else {
 			/* Otherwise we have to open the node and look at all children nodes in turn */
 
@@ -309,6 +323,9 @@ int main(int argc, char **argv)
 {
 	double t0, t1;			// Start/stop times.
 	const int N = MAX_POINTS; 	// Number of particles in the simulation.
+	
+	
+	
 	
 	srand48(42);			// Set a random number seed
 
@@ -355,20 +372,38 @@ int main(int argc, char **argv)
 	/* Stop the timer. */
 	t1 = (double) clock();
 	printf("\nForce calculation with tree took:        %8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
+	 
+	double dx[3], dx2, m;
+	double eps2 = eps * eps;  
 
 	/* Start the timer. */
 	t0 = (double) clock();
-
-	/* Calculate the accelerations with direct summation, for comparison. */
-	for(int i = 0; i < N; i++) {
+	
+	/* Calculate the accelerations with direct summation, for comparison. */	
+	for (int i = 0; i < N; i++) {
+		/* Set accelerations to zero. */
+		for (int d = 0; d < 3; d++) {
+			star[i].acc_exact[d] = 0;
+		}		
 		
-		/*
-		 * ..... TO BE FILLED IN ....
-		 *
-		 *     star[i].acc_exact[0] = ....
-		 *     star[i].acc_exact[0] = ....
-		 *     star[i].acc_exact[0] = ....
-   		 */
+		/* Direct summation. For each particle, sum over all particles.*/
+		for (int j = 0; i < N; j++) {
+			/* Ensure no self-interaction. */
+			if (i != j) {
+				/* Find displacement vector. */
+				dx2 = 0;
+				for (int d = 0; d < 3; d++) {
+					dx[d] = star[i].pos[d] - star[j].pos[d]; 
+					dx2 += dx[d] * dx[d]; 
+				}
+				m = star[j].mass; 
+				
+				/* Add contribution to acceleration. */
+				for (int d = 0; d < 3; d++) {
+					star[i].acc_exact[d] -= G*m*dx[d] / pow(dx2+eps2, 1.5);
+				}	
+			} 	
+		}
 	}
 	
 	/* Stop the timer. */
