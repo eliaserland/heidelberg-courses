@@ -388,7 +388,7 @@ int main(int argc, char **argv)
 		}		
 		
 		/* Direct summation. For each particle, sum over all particles.*/
-		for (int j = 0; i < N; j++) {
+		for (int j = 0; j < N; j++) {
 			/* Ensure no self-interaction. */
 			if (i != j) {
 				/* Find displacement vector. */
