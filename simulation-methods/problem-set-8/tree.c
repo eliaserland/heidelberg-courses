@@ -26,7 +26,9 @@ static int MAX_NODES;			  // Max no. of nodes in tree.
 
 static double opening_threshold = 0.8;   // Deafult Tree opening angle.       
 const static double eps	 = 0.001; // Gravitational softening length. 	 
-const static double G 		 = 1.0;   // Newton's gravitational const.   	
+const static double G 		 = 1.0;   // Newton's gravitational const.
+
+static bool quadrupoles = false;    	  // Use quadrupole moments. (Off by default)
 
 // ========================== Internal datatypes ==============================
 
@@ -225,6 +227,9 @@ void calc_multipole_moments(node *current)
 			current->mass = current->p->mass;
 			for (j = 0; j < 3; j++) {
 				current->cm[j] = current->p->pos[j];
+			
+			// Quadrupole 
+			
 			}	
 		} else {
 			/* Nothing in here at all; let's initialize the multipole moments to zero. */
@@ -331,34 +336,45 @@ int main(int argc, char **argv)
 	bool use_default_t = true;
 	
 	// Parse all arguments.	
-	while((opt = getopt(argc, argv, "n:t:")) != -1) {  
+	while((opt = getopt(argc, argv, "n:t:m")) != -1) {  
 		switch(opt) {  
             		case 'n':
-            		{
+            			/* Interpret the number of particles to use. */
             			N = atoi(optarg);  
-                		printf("Number of particles:     N     = %d\n", N);  
+                		  
                 		use_default_N = false; 
 				break;
-			}
 			case 't': 
-			{
+				/* Interpret the opening angle threshold to use. */
 				opening_threshold = atof(optarg);
-				printf("Opening angle threshold: theta = %f\n", opening_threshold);  
 				use_default_t = false;
 				break; 			
-			} 
+			case 'm': 
+				/* Toggle acceleration calculation using quadrupole moments. */ 
+				quadrupoles = true; 
+				break;
         	}  
     	}
-    	if (use_default_N && use_default_t) {
-    		fprintf(stderr, "Usage:\n\t [-n] N [-t] theta \n"
+    	if (use_default_N && use_default_t && !quadrupoles) {
+    		fprintf(stderr, "Usage:\n\t [-n] N [-t] theta [-m]\n"
     			"\t where N is an integer, giving the numer of particles, \n"
-    			"\t and theta is the opening angle threshold. \n\n"); 
+    			"\t and theta is the opening angle threshold. \n"
+    			"\t Use -m to estimate acceleration up to quadrupole moments.\n\n"); 
     	} 
+    	if (quadrupoles) {
+    		fprintf(stderr, "Acceleration calculated using monopole & quadrupole moments.\n\n");	
+    	} else {
+    		fprintf(stderr, "Acceleration calculated using only monopole moments.\n\n");	
+    	}
     	if (use_default_N) {
     		fprintf(stderr, "Using default value:     N     = %d\n", N); 
+    	} else {
+    		fprintf(stderr, "Number of particles:     N     = %d\n", N);
     	}
     	if (use_default_t) {
     		fprintf(stderr, "Using default value:     theta = %f\n", opening_threshold);
+    	} else {
+    		fprintf(stderr, "Opening angle threshold: theta = %f\n", opening_threshold); 
     	}
     	
     	
