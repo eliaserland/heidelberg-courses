@@ -8,6 +8,7 @@
  *   	Author: Elias Olofsson
  * 	Date: 2021-01-20
  */
+#define _XOPEN_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -204,7 +205,7 @@ void calc_multipole_moments(node *current)
 		}		
 		// Normalize the weighted average for the combined center of mass.
 		for (j = 0; j < 3; j++) {
-			current->cm[j] /= current->mass
+			current->cm[j] /= current->mass;
 		}
 		//--------------------------------------------------------------
 		/* Quadrupole moment (Optional)*/
@@ -268,7 +269,7 @@ void walk_tree(node *current, double pos[3], double acc[3])
 {
 	int n;
 	double theta;
-	double y[3], y1, y2, y3;
+	double y[3], y1, y2, y3, M;
 
 	/* Only do something if there is mass in this branch of the tree (i.e. if it is not empty). */
 	if(current->mass) {
