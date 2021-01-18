@@ -19,7 +19,7 @@
 #include <time.h>
 #include <stdbool.h>
 
-// =========================== Global parameters ==============================
+// =========================== Global variables ==============================
 
 static int N = 5000;      		  // Default max no. of particles used. 
 static int MAX_NODES;			  // Max no. of nodes in tree.	 
@@ -29,6 +29,7 @@ const static double eps	 = 0.001; // Gravitational softening length.
 const static double G 		 = 1.0;   // Newton's gravitational const.
 
 static bool quadrupoles = false;    	  // Use quadrupole moments. (Off by default)
+static int node_counter = 0; 		  // Counter of particle-node interactions.	
 
 // ========================== Internal datatypes ==============================
 
@@ -54,7 +55,7 @@ typedef struct node {
 static node     *tree;
 static particle *star;
 
-// ========================== Internal functions ==============================
+// ========================== Internal functions git ==============================
 
 /**
  * get_empty_node() - Return pointer to an empty tree node.
@@ -303,18 +304,24 @@ void walk_tree(node *current, double pos[3], double acc[3])
 			/* Ensure no self-interaction, ie distance to the reference 
 			   point from the node CM is small (~0). */
 			if (y1 > 10e-10) {
-				y3 = y1 * y2; 
-				M = current->mass; // Total mass of node.
+				// Increment particle-node interaction counter.
+				node_counter++; 
 				
-				/* Acceleration from monopole-moments. */
+				// Get |y|^3 and total mass of node.
+				y3 = y1 * y2; 
+				M = current->mass;
+				
+				// Calculate acceleration due monopole moments.
 				for (int i = 0; i < 3; i++) {
 					acc[i] -= G*M*y[i]/y3;
 				}
 				
+				// If user has chosen so, also calculate quad-moments.
+				if (quadrupoles) {
 				
-				// --------------------
-				// Acceleration from quadrupole moments...
+					
 				
+				}
 			}
 		} else {
 			/* Otherwise we have to open the node and look at all children nodes in turn */
@@ -466,7 +473,7 @@ int main(int argc, char **argv)
 	
 	/* Stop the timer. */
 	t1 = (double) clock();
-	printf("\nCalculation with direct summation:   %9.8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
+	printf("Calculation with direct summation:   %9.8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
 
 	/* Now do the calculation of the mean relative error. */
 	double err_sum = 0;
@@ -488,8 +495,9 @@ int main(int argc, char **argv)
 	}
 	err_sum /= N;
 
-	printf("\nAverage relative error:  		 %8g\n", err_sum);
+	printf("\nAverage relative error:  		 		%-8g\n", err_sum);
 	
+	printf("Average particle-node interactions per particle:	%-8g\n", (double) node_counter/N);
 	free(tree);
 	free(star);
 
