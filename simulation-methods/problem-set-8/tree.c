@@ -45,7 +45,8 @@ typedef struct particle {
 typedef struct node {
 	double center[3];
 	double len; 
-	double cm[3];
+	double cm[3];	
+	double qm[9];
 	double mass;
 	struct node *children[8];
 	particle *p;
@@ -184,20 +185,26 @@ void insert_particle(node *current, particle *pnew)
  */ 
 void calc_multipole_moments(node *current)
 {
-	int n, j;
 	node *child;
+	
+	double  dr2, dr[3], drdr[9];  
 
 	/* Do we have subnodes? */
 	if(current->children[0]) {
 		/* Yes, so let's first calculate their multipole moments. */
-		for (n = 0; n < 8; n++) {
+		for (int n = 0; n < 8; n++) {
 			calc_multipole_moments(current->children[n]);
 		}
 		
 		/* Initialize the node multipole moments to zero. */
 		current->mass  = 0;
-		for (j = 0; j < 3; j++) {
+		for (int j = 0; j < 3; j++) {
 			current->cm[j] = 0;
+		}
+		if (quadrupoles) {
+			for (int i = 0; i < 9; i++) {
+				current->qm[i] = 0; 
+			}
 		}
 		
 		/* Now calculate the moment of the current node from those of its children */
@@ -205,19 +212,60 @@ void calc_multipole_moments(node *current)
 		/* Monopole moment: 
 		   For each of the children, sum up the total mass from the 
 		   children and the calculate the combined center of mass. */
-		for (n = 0; n < 8; n++) {
+		for (int n = 0; n < 8; n++) {
 			child = current->children[n];
 			current->mass += child->mass;
-			for (j = 0; j < 3; j++) {
+			for (int j = 0; j < 3; j++) {
 				current->cm[j] += child->mass * child->cm[j];
 			} 
 		}		
-		// Normalize the weighted average for the combined center of mass.
-		for (j = 0; j < 3; j++) {
+		// Normalize the weighted average to get the combined center of mass.
+		for (int j = 0; j < 3; j++) {
 			current->cm[j] /= current->mass;
 		}
 		//--------------------------------------------------------------
-		/* Quadrupole moment (Optional)*/
+		/* Quadrupole moment: 
+		   If user has chosen so, also calculate the quadrupole-moments. */
+		if (quadrupoles) {
+			// For each of the chilren, get the resulting quad-moment.
+			for (int n = 0; n < 8; n++) {
+				// Get pointer to the child. 
+				child = current->children[n];	
+				
+				// Find the displacement vector, and it's square.
+				dr2 = 0;
+				for (int d = 0; d < 3; d++) {
+					dr[d] = current->cm[d] - child->cm[d]; 
+					dr2 += dr[d] * dr[d];
+				}
+				
+				// Form outer product dr * dr, and multiply by 3.
+				// Subtract dr2 from the diagonal elements. 
+				for (int i = 0; i < 3; i++) {
+					for (int j = 0; j < 3; j++) {
+						drdr[3*i+j] = 3.*dr[i]*dr[j];
+						if (i == j) {
+							drdr[3*i+j] -= dr2;  
+						} 
+					}
+				}
+				
+				// Multiply with the total mass of the subnode.
+				for (int i = 0; i < 9; i++) {
+					drdr[i] *= child->mass;  
+				}
+				
+				// Include old quad-moment from subnode.
+				for (int i = 0; i < 9; i++) {
+					drdr[i] += child->qm[i]; 
+				}
+				
+				// Add total quad-contribution to the current node.
+				for (int i = 0; i < 9; i++) {
+					current->qm[i] += drdr[i]; 	
+				}
+			}
+		}
 		
 	
 	} else {
@@ -226,17 +274,21 @@ void calc_multipole_moments(node *current)
 		if (current->p) {
 			/* Yes, so let's copy this particle to the multipole moments of the node. */
 			current->mass = current->p->mass;
-			for (j = 0; j < 3; j++) {
+			for (int j = 0; j < 3; j++) {
 				current->cm[j] = current->p->pos[j];
-			
-			// Quadrupole 
-			
+			}
+			// Quadrupole moments in node with a single particle are always zero.
+			for (int i = 0; i < 9; i++) {
+				current->qm[i] = 0; 
 			}	
 		} else {
 			/* Nothing in here at all; let's initialize the multipole moments to zero. */
 			current->mass  = 0;
-			for (j = 0; j < 3; j++) {
+			for (int j = 0; j < 3; j++) {
 				current->cm[j] = 0;
+			}
+			for (int i = 0; i < 9; i++) {
+				current->qm[i] = 0; 
 			}
 		}
 	}
@@ -281,7 +333,10 @@ void walk_tree(node *current, double pos[3], double acc[3])
 {
 	int n;
 	double theta;
-	double y[3], y1, y2, y3, M;
+	double y[3], y1, y2, y3, y5, M;
+	
+	double yQy, yQ[3];
+	double *Q; 
 
 	/* Only do something if there is mass in this branch of the tree (i.e. if it is not empty). */
 	if(current->mass) {
@@ -316,11 +371,34 @@ void walk_tree(node *current, double pos[3], double acc[3])
 					acc[i] -= G*M*y[i]/y3;
 				}
 				
-				// If user has chosen so, also calculate quad-moments.
+				/* If user has chosen so, also calculate acceleration
+				   using quad-moments. */
 				if (quadrupoles) {
-				
+					y5 = y3 * y2; 
+					// Pointer to node's quadrupole moment. 
+					Q = current->qm; 
 					
-				
+					// Form matrix product y_i * Q_ij * y_j
+					yQy = 0;
+					for (int i = 0; i < 3; i++) {
+						for (int j = 0; j < 3; j++) {
+							yQy += y[i]*Q[3*i+j]*y[j];	
+						}
+					}
+					
+					// Form matrix product 2 * y^T * Q
+					for (int i = 0; i < 3; i++) {
+						yQ[i] = 0;
+						for (int j = 0; j < 3; j++) {
+							yQ[i] += y[j] * Q[3*i+j]; 
+						}
+						yQ[i] *= 2.0; 
+					}
+		
+					// Add quad-contributions to the acceleration.
+					for (int i = 0; i < 3; i++) {
+						acc[i] -= G*0.5*(5.*yQy*y[i]/y2 - yQ[i])/y5; 
+					}
 				}
 			}
 		} else {
@@ -343,7 +421,7 @@ int main(int argc, char **argv)
 	bool use_default_t = true;
 	
 	// Parse all arguments.	
-	while((opt = getopt(argc, argv, "n:t:m")) != -1) {  
+	while((opt = getopt(argc, argv, "n:t:q")) != -1) {  
 		switch(opt) {  
             		case 'n':
             			/* Interpret the number of particles to use. */
@@ -356,34 +434,34 @@ int main(int argc, char **argv)
 				opening_threshold = atof(optarg);
 				use_default_t = false;
 				break; 			
-			case 'm': 
+			case 'q': 
 				/* Toggle acceleration calculation using quadrupole moments. */ 
 				quadrupoles = true; 
 				break;
         	}  
     	}
     	if (use_default_N && use_default_t && !quadrupoles) {
-    		fprintf(stderr, "Usage:\n\t [-n] N [-t] theta [-m]\n"
+    		fprintf(stderr, "Usage:\n\t [-n] N [-t] theta [-q]\n"
     			"\t where N is an integer, giving the numer of particles, \n"
     			"\t and theta is the opening angle threshold. \n"
-    			"\t Use -m to estimate acceleration up to quadrupole moments.\n\n"); 
+    			"\t Use -q to estimate acceleration up to quadrupole moments.\n\n"); 
+    		return 1;
     	} 
     	if (quadrupoles) {
-    		fprintf(stderr, "Acceleration calculated using monopole & quadrupole moments.\n\n");	
+    		fprintf(stderr, "Using monopole & quadrupole moments.\n\n");	
     	} else {
-    		fprintf(stderr, "Acceleration calculated using only monopole moments.\n\n");	
+    		fprintf(stderr, "Using only monopole moments.\n\n");	
     	}
     	if (use_default_N) {
-    		fprintf(stderr, "Using default value:     N     = %d\n", N); 
+    		fprintf(stderr, "Using default size:        N     = %-d\n", N); 
     	} else {
-    		fprintf(stderr, "Number of particles:     N     = %d\n", N);
+    		fprintf(stderr, "Number of particles:       N     = %-d\n", N);
     	}
     	if (use_default_t) {
-    		fprintf(stderr, "Using default value:     theta = %f\n", opening_threshold);
+    		fprintf(stderr, "Using default threshold:   theta = %-.2f\n", opening_threshold);
     	} else {
-    		fprintf(stderr, "Opening angle threshold: theta = %f\n", opening_threshold); 
+    		fprintf(stderr, "Opening angle threshold:   theta = %-.4f\n", opening_threshold); 
     	}
-    	
     	
 	MAX_NODES = 5*N;	// Max no. of nodes in tree.
 	
@@ -436,7 +514,7 @@ int main(int argc, char **argv)
 
 	/* Stop the timer. */
 	t1 = (double) clock();
-	printf("\nForce calculation with tree:         %9.8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
+	printf("\nForce calculation with tree:         %-9g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
 	 
 	double dx[3], dx2, m;
 	double eps2 = eps * eps;  
@@ -473,12 +551,12 @@ int main(int argc, char **argv)
 	
 	/* Stop the timer. */
 	t1 = (double) clock();
-	printf("Calculation with direct summation:   %9.8g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
+	printf("Calculation with direct summation:   %-9g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
 
-	/* Now do the calculation of the mean relative error. */
 	double err_sum = 0;
 	double diff[3], diff2, dir_acc, tree_acc, direct2;  
 	
+	/* Calculate of the mean relative error. */
 	for (int i = 0; i < N; i++) {
 		diff2   = 0;
 		direct2 = 0;
@@ -495,9 +573,9 @@ int main(int argc, char **argv)
 	}
 	err_sum /= N;
 
-	printf("\nAverage relative error:  		 		%-8g\n", err_sum);
+	printf("\nAverage relative error:  		 	   %-8g\n", err_sum);
 	
-	printf("Average particle-node interactions per particle:	%-8g\n", (double) node_counter/N);
+	printf("Average particle-node interactions per particle:   %-8g\n", (double) node_counter/N);
 	free(tree);
 	free(star);
 
