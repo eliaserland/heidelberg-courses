@@ -458,7 +458,7 @@ int main(int argc, char **argv)
         	}  
     	}
     	if (use_default_N && use_default_t && !quadrupoles) {
-    		fprintf(stderr, "Usage:\n\t [-n] N [-t] theta [-q]\n"
+    		fprintf(stderr, "Usage:\n\t [-n] N [-t] theta [-q] [-m]\n"
     			"\t where N is an integer, giving the numer of particles, \n"
     			"\t and theta is the opening angle threshold. \n"
     			"\t Use -q to estimate acceleration up to quadrupole moments.\n"
@@ -467,7 +467,7 @@ int main(int argc, char **argv)
     	} 
 	    	
 	if (machine_table) {
-		printf("%d, %4.4f, %d, ", N, opening_threshold, quadrupoles);
+		printf("%d %f %d ", N, opening_threshold, quadrupoles);
 	} else {
 	    	if (quadrupoles) {
 	    		fprintf(stderr, "Using monopole & quadrupole moments.\n\n");	
@@ -538,7 +538,7 @@ int main(int argc, char **argv)
 	/* Stop the timer. */
 	t1 = (double) clock();
 	if (machine_table) {
-		printf("%9g, ", (t1 - t0) / CLOCKS_PER_SEC);
+		printf("%9g ", (t1 - t0) / CLOCKS_PER_SEC);
 	} else {
 		printf("\nForce calculation with tree:         %-9g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
 	}
@@ -579,7 +579,7 @@ int main(int argc, char **argv)
 	/* Stop the timer. */
 	t1 = (double) clock();
 	if (machine_table) {
-		printf("%9g, ", (t1 - t0) / CLOCKS_PER_SEC);
+		printf("%9g ", (t1 - t0) / CLOCKS_PER_SEC);
 	} else {
 		printf("Calculation with direct summation:   %-9g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
 	}
@@ -604,7 +604,7 @@ int main(int argc, char **argv)
 	err_sum /= N;
 
 	if (machine_table) {
-		printf("%12g, %9g\n", err_sum, (double) node_counter/N);
+		printf("%g %g\n", err_sum, (double) node_counter/N);
 	} else {
 		printf("\nAverage relative error:  		 	   %-9g\n", err_sum);
 		printf("Average particle-node interactions per particle:   %-9g\n", (double) node_counter/N);

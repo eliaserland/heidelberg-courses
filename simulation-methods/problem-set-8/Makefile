@@ -9,7 +9,6 @@
 
 EXE = tree
 
-#SRC = /home/elias/Documents/pcg-c-basic-master/pcg_basic.o
 OBJ = $(SRC:.c=.o)
 
 CC = gcc
