@@ -9,7 +9,7 @@
 
 
 <style type="text/css">
-    pre { line-height: 125%; margin: 0; }
+    pre { line-height: 125%; }
 td.linenos pre { color: #000000; background-color: #f0f0f0; padding-left: 5px; padding-right: 5px; }
 span.linenos { color: #000000; background-color: #f0f0f0; padding-left: 5px; padding-right: 5px; }
 td.linenos pre.special { color: #000000; background-color: #ffffc0; padding-left: 5px; padding-right: 5px; }
@@ -14267,7 +14267,7 @@ referee.
 Note that this part of the exercise is pretty open ended, hence there are a number of viable choices here.</p>
 
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
 <div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[1]:</div>
@@ -14275,9 +14275,22 @@ Note that this part of the exercise is pretty open ended, hence there are a numb
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+</pre></div>
 
-<span class="c1"># load the data from file as pandas dataformat</span>
-<span class="n">data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;CrowdstormingDataJuly1st.csv&quot;</span><span class="p">)</span>
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># load the data from file as pandas DataFrame</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">original_data</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">&quot;CrowdstormingDataJuly1st.csv&quot;</span><span class="p">)</span>
 
 <span class="c1"># look at the data format</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of the raw data:&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -14325,10 +14338,10 @@ Columns (Features) of the raw data: Index([&#39;playerShort&#39;, &#39;player&#3
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[2]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mask</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span> <span class="n">data</span><span class="p">[</span><span class="s1">&#39;photoID&#39;</span><span class="p">]</span> <span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">mask</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">notnull</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;photoID&#39;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of missing photo IDs&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">mask</span><span class="p">))</span>
 <span class="c1"># drop rows with missing ids:</span>
 <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">mask</span><span class="p">]</span>
@@ -14372,7 +14385,7 @@ Columns (Features) of the raw data: Index([&#39;playerShort&#39;, &#39;player&#3
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[3]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of unique playerShorts:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;playerShort&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -14423,7 +14436,7 @@ Here is the list of features we drop and our reasoning for this:</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[4]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Number of unique refCountrys:&quot;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;refCountry&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
@@ -14461,13 +14474,13 @@ Number of unique Alpha_3s: 160
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># construct dataset with only the features that seem (definetly) relevant</span>
 <span class="n">irrelevant_feats</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;photoID&#39;</span><span class="p">,</span> <span class="s1">&#39;Alpha_3&#39;</span><span class="p">,</span> <span class="s1">&#39;yellowCards&#39;</span><span class="p">,</span>
                     <span class="s1">&#39;meanIAT&#39;</span><span class="p">,</span> <span class="s1">&#39;nIAT&#39;</span><span class="p">,</span> <span class="s1">&#39;nIAT&#39;</span><span class="p">,</span> <span class="s1">&#39;seIAT&#39;</span><span class="p">,</span> <span class="s1">&#39;meanExp&#39;</span><span class="p">,</span> <span class="s1">&#39;nExp&#39;</span><span class="p">,</span> <span class="s1">&#39;seExp&#39;</span><span class="p">,</span> <span class="s1">&#39;refNum&#39;</span><span class="p">,</span> <span class="s1">&#39;refCountry&#39;</span><span class="p">]</span>
-<span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">irrelevant_feats</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">irrelevant_feats</span><span class="p">,</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Shape of dataset after dropping irrelevant features:&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
 </pre></div>
 
@@ -14506,7 +14519,7 @@ Number of unique Alpha_3s: 160
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[6]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="o">.</span><span class="n">dropna</span><span class="p">(</span><span class="n">axis</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
@@ -14548,7 +14561,7 @@ Number of unique Alpha_3s: 160
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[7]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">gdata</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">([</span><span class="s1">&#39;playerShort&#39;</span><span class="p">])</span>
@@ -14558,7 +14571,7 @@ Number of unique Alpha_3s: 160
 <span class="n">static_data</span> <span class="o">=</span> <span class="n">data</span><span class="p">[</span><span class="n">static_features</span><span class="p">]</span>
 <span class="n">static_data</span> <span class="o">=</span> <span class="n">static_data</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
 
-<span class="n">data</span> <span class="o">=</span> <span class="n">variable_data</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">static_data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;playerShort&#39;</span><span class="p">),</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;playerShort&#39;</span><span class="p">)</span>
+<span class="n">aggregated_data</span> <span class="o">=</span> <span class="n">variable_data</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">static_data</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">&#39;playerShort&#39;</span><span class="p">),</span> <span class="n">on</span><span class="o">=</span><span class="s1">&#39;playerShort&#39;</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14582,11 +14595,39 @@ For the features, we need to make some adjustments:</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[8]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;rater1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;rater2&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-<span class="n">data</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;rater1&#39;</span><span class="p">,</span> <span class="s1">&#39;rater2&#39;</span><span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prediction_data</span> <span class="o">=</span> <span class="n">aggregated_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">del</span> <span class="n">data</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">prediction_data</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">prediction_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;rater1&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">prediction_data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span><span class="s1">&#39;rater2&#39;</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
+<span class="n">prediction_data</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;rater1&#39;</span><span class="p">,</span> <span class="s1">&#39;rater2&#39;</span><span class="p">],</span> <span class="n">axis</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">inplace</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span>
 </pre></div>
 
      </div>
@@ -14611,7 +14652,7 @@ For the features, we need to make some adjustments:</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># construct the feature matrices</span>
@@ -14627,7 +14668,11 @@ For the features, we need to make some adjustments:</p>
         <span class="bp">self</span><span class="o">.</span><span class="n">data</span> <span class="o">=</span> <span class="n">data</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">ordinal_feats</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">,</span> <span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="s1">&#39;weight&#39;</span><span class="p">,</span> <span class="s1">&#39;games&#39;</span><span class="p">,</span> <span class="s1">&#39;victories&#39;</span><span class="p">,</span> 
                               <span class="s1">&#39;ties&#39;</span><span class="p">,</span> <span class="s1">&#39;defeats&#39;</span><span class="p">,</span> <span class="s1">&#39;goals&#39;</span><span class="p">,</span> <span class="s1">&#39;birthday&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ordinal_feats</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ordinal_feats</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feats</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;player&#39;</span><span class="p">,</span> <span class="s1">&#39;club&#39;</span><span class="p">,</span> <span class="s1">&#39;leagueCountry&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feats</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_feats</span><span class="p">)</span> <span class="o">&amp;</span> <span class="nb">set</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">columns</span><span class="p">))</span>
+        
         <span class="bp">self</span><span class="o">.</span><span class="n">n_ord</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ordinal_feats</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_cat</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">categorical_feats</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">n_onehot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">feat</span><span class="p">]</span><span class="o">.</span><span class="n">unique</span><span class="p">())</span> <span class="k">for</span> <span class="n">feat</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">categorical_feats</span><span class="p">])</span>
@@ -14688,7 +14733,7 @@ For the features, we need to make some adjustments:</p>
         <span class="n">labs_to_pos</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">unique_labs</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="n">labs_to_pos</span><span class="p">[</span><span class="n">unique_labs</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="n">i</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="n">pos</span> <span class="o">=</span> <span class="n">labs_to_pos</span><span class="p">[</span><span class="n">cat_feats</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
             <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">,</span><span class="n">pos</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
         <span class="k">return</span> <span class="n">X</span>
@@ -14751,7 +14796,7 @@ For the features, we need to make some adjustments:</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[11]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># base classes</span>
@@ -14900,10 +14945,10 @@ For the features, we need to make some adjustments:</p>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[12]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dset</span> <span class="o">=</span> <span class="n">myDataset</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">dset</span> <span class="o">=</span> <span class="n">myDataset</span><span class="p">(</span><span class="n">prediction_data</span><span class="p">)</span>
 <span class="c1"># define the different models:</span>
 <span class="kn">from</span> <span class="nn">sklearn</span> <span class="kn">import</span> <span class="n">linear_model</span>
 <span class="n">linear</span>   <span class="o">=</span> <span class="n">linear_model</span><span class="o">.</span><span class="n">LinearRegression</span><span class="p">()</span>
@@ -14968,13 +15013,13 @@ Dataset: X_on
 test_err: 9.74E-05
 Dataset: X_oc_
 test_err: 8.36E-05
-Running: &lt;__main__.RegressionTree object at 0x7fd0a9496910&gt;
+Running: &lt;__main__.RegressionTree object at 0x7f8e61122e90&gt;
 Dataset: X_oc
-test_err: 8.28E-05
+test_err: 9.37E-05
 Dataset: X_on
-test_err: 8.58E-05
+test_err: 8.36E-05
 Dataset: X_oc_
-test_err: 8.68E-05
+test_err: 8.77E-05
 Done.
 </pre>
 </div>
@@ -14992,7 +15037,7 @@ Done.
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># we take the dataset X_oc_ as our baseline</span>
@@ -15014,13 +15059,13 @@ Done.
 <div class="jp-OutputArea-child">
 
     
-    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[14]:</div>
+    <div class="jp-OutputPrompt jp-OutputArea-prompt">Out[15]:</div>
 
 
 
 
 <div class="jp-RenderedText jp-OutputArea-output jp-OutputArea-executeResult" data-mime-type="text/plain">
-<pre>(8.358490812931555e-05, 8.596119666252678e-05)</pre>
+<pre>(8.358490812931557e-05, 8.987435629006924e-05)</pre>
 </div>
 
 </div>
@@ -15029,23 +15074,23 @@ Done.
 
 </div>
 
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
 <div class="jp-Cell-inputWrapper">
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[15]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[16]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
      <div class="CodeMirror cm-s-jupyter">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># create shuffled datasets:</span>
-<span class="k">def</span> <span class="nf">test_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n_shufflesets</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">test_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n_shufflesets</span><span class="p">,</span> <span class="n">pred_variable</span><span class="o">=</span><span class="s2">&quot;rating&quot;</span><span class="p">):</span>
     <span class="n">shufflesets</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># set a random seed to make results reproducible</span>
     <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">seed</span><span class="p">(</span><span class="mi">1089045</span><span class="p">)</span>
     <span class="c1"># shuffling works inplace, therefore we retrieve a copy</span>
-    <span class="n">rating</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">rating</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="n">pred_variable</span><span class="p">])</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
     <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_shufflesets</span><span class="p">):</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">rating</span><span class="p">)</span>
         <span class="n">shuffled_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">shuffled_data</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rating</span>
+        <span class="n">shuffled_data</span><span class="p">[</span><span class="n">pred_variable</span><span class="p">]</span> <span class="o">=</span> <span class="n">rating</span>
         <span class="n">shufflesets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">myDataset</span><span class="p">(</span><span class="n">shuffled_data</span><span class="p">))</span>
 
     <span class="c1"># evaluate them:</span>
@@ -15066,9 +15111,34 @@ Done.
     <span class="n">n_larger_regtree</span> <span class="o">=</span> <span class="p">(</span><span class="n">shuffled_err_regtree</span> <span class="o">&gt;</span> <span class="n">orig_err_regtree</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
     
     <span class="k">return</span> <span class="n">n_larger_linear</span><span class="p">,</span> <span class="n">n_larger_regtree</span>
+</pre></div>
 
-<span class="n">n_shufflesets</span> <span class="o">=</span> <span class="mi">19</span>
-<span class="n">n_larger_linear</span><span class="p">,</span> <span class="n">n_larger_regtree</span> <span class="o">=</span> <span class="n">test_data</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">n_shufflesets</span><span class="p">)</span>
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[17]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_shufflesets</span> <span class="o">=</span> <span class="mi">19</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[18]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_larger_linear</span><span class="p">,</span> <span class="n">n_larger_regtree</span> <span class="o">=</span> <span class="n">test_data</span><span class="p">(</span><span class="n">prediction_data</span><span class="p">,</span> <span class="n">n_shufflesets</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of greater test errors with shuffled data and linear model: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_larger_linear</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of greater test errors with shuffled data and regression tree model: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_larger_regtree</span><span class="p">)</span>
@@ -15111,7 +15181,7 @@ Run shuffleset no 17
 Run shuffleset no 18
 Run shuffleset no 19
 Number of greater test errors with shuffled data and linear model: 19
-Number of greater test errors with shuffled data and regression tree model: 15
+Number of greater test errors with shuffled data and regression tree model: 3
 </pre>
 </div>
 </div>
@@ -15134,12 +15204,508 @@ Number of greater test errors with shuffled data and regression tree model: 15
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Note that for this exercise, there is a plethora of different approaches.</p>
+<p>Our solution is inspired by <code>{"Alexander Kunkel", "Daniel Galperin", "Jonas Hellgoth"}</code>'s solution. Many thanks :)</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We provide two ways to prepare the data:</p>
+<ol>
+<li><em>Cherry picking aka data selection</em>: We select data that confirms our hypothesis beforehand. We pick the data where the skin colour raters disagree. This choice has no other reason than that it works.</li>
+<li><em>Feature selection</em>. You learnt in the lecture that feature selection can make your model more robust. However, when making causality statements, this can be misleading/manipulating. Here, we drop most of the features that are also relevant to the prediction, so that only a few in addition to the skin colour remain. Intuitively, with so few features, the skin colour must have an influence.</li>
+</ol>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Cherry-Picking">Cherry Picking<a class="anchor-link" href="#Cherry-Picking">&#182;</a></h3>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[19]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">data_cherry_pick</span> <span class="o">=</span> <span class="n">aggregated_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># drop rows if raters disagree</span>
+<span class="n">data_cherry_pick</span> <span class="o">=</span> <span class="n">data_cherry_pick</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data_cherry_pick</span><span class="o">.</span><span class="n">rater1</span> <span class="o">==</span> <span class="n">data_cherry_pick</span><span class="o">.</span><span class="n">rater2</span><span class="p">]</span>
+<span class="n">data_cherry_pick</span><span class="p">[</span><span class="s1">&#39;rating&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data_cherry_pick</span><span class="p">[</span><span class="s1">&#39;rater1&#39;</span><span class="p">]</span>
+<span class="n">data_cherry_pick</span> <span class="o">=</span> <span class="n">data_cherry_pick</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;rater2&#39;</span><span class="p">,</span> <span class="s1">&#39;rater1&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">new_count</span> <span class="o">=</span> <span class="n">data_cherry_pick</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="n">removed_count</span> <span class="o">=</span> <span class="n">aggregated_data</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">data_cherry_pick</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">removed_count</span><span class="si">}</span><span class="s2"> entries removed because of inconsistent ratings, </span><span class="si">{</span><span class="n">new_count</span><span class="si">}</span><span class="s2"> remaining.&quot;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>348 entries removed because of inconsistent ratings, 1071 remaining.
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[20]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_larger_linear</span><span class="p">,</span> <span class="n">n_larger_regtree</span> <span class="o">=</span> <span class="n">test_data</span><span class="p">(</span><span class="n">data_cherry_pick</span><span class="p">,</span> <span class="n">n_shufflesets</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of greater test errors with shuffled data and linear model: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_larger_linear</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of greater test errors with shuffled data and regression tree model: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_larger_regtree</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>Run shuffleset no 1
+Run shuffleset no 2
+Run shuffleset no 3
+Run shuffleset no 4
+Run shuffleset no 5
+Run shuffleset no 6
+Run shuffleset no 7
+Run shuffleset no 8
+Run shuffleset no 9
+Run shuffleset no 10
+Run shuffleset no 11
+Run shuffleset no 12
+Run shuffleset no 13
+Run shuffleset no 14
+Run shuffleset no 15
+Run shuffleset no 16
+Run shuffleset no 17
+Run shuffleset no 18
+Run shuffleset no 19
+Number of greater test errors with shuffled data and linear model: 0
+Number of greater test errors with shuffled data and regression tree model: 1
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We see that this approach rejects the hypothesis of racial bias.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Manual-Feature-Reduction">Manual Feature Reduction<a class="anchor-link" href="#Manual-Feature-Reduction">&#182;</a></h3>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[21]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># drop many attributes</span>
+<span class="n">reduced_data</span> <span class="o">=</span> <span class="n">prediction_data</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s1">&#39;weight&#39;</span><span class="p">,</span><span class="s1">&#39;height&#39;</span><span class="p">,</span> <span class="s1">&#39;victories&#39;</span><span class="p">,</span> <span class="s1">&#39;defeats&#39;</span><span class="p">,</span> <span class="s1">&#39;position&#39;</span><span class="p">,</span> <span class="s1">&#39;leagueCountry&#39;</span><span class="p">,</span>
+                                     <span class="s1">&#39;birthday&#39;</span><span class="p">,</span> <span class="s1">&#39;club&#39;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[22]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">n_larger_linear</span><span class="p">,</span> <span class="n">n_larger_regtree</span> <span class="o">=</span> <span class="n">test_data</span><span class="p">(</span><span class="n">reduced_data</span><span class="p">,</span> <span class="n">n_shufflesets</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of greater test errors with shuffled data and linear model: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_larger_linear</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of greater test errors with shuffled data and regression tree model: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_larger_regtree</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>Run shuffleset no 1
+Run shuffleset no 2
+Run shuffleset no 3
+Run shuffleset no 4
+Run shuffleset no 5
+Run shuffleset no 6
+Run shuffleset no 7
+Run shuffleset no 8
+Run shuffleset no 9
+Run shuffleset no 10
+Run shuffleset no 11
+Run shuffleset no 12
+Run shuffleset no 13
+Run shuffleset no 14
+Run shuffleset no 15
+Run shuffleset no 16
+Run shuffleset no 17
+Run shuffleset no 18
+Run shuffleset no 19
+Number of greater test errors with shuffled data and linear model: 19
+Number of greater test errors with shuffled data and regression tree model: 8
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Recipy 3 (Only a few features given) leads to models which support the thesis of racial bias.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
 <h2 id="2.5-Alternative-Hypotheses">2.5 Alternative Hypotheses<a class="anchor-link" href="#2.5-Alternative-Hypotheses">&#182;</a></h2>
 </div>
 </div>
 <div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
-<p>We will publish a sample solution later today or early next week.</p>
+<p>Because we only show correlation, there are other causalities which could lead to the same manifestation of test results besides an actual racial bias. We test two explanations here:</p>
+<ol>
+<li>We suspect that dark colored players play in <em>positions prone to get more red cards</em> such as defense.</li>
+<li>We suspect dark colored players being <em>more likely to be taller</em> so the probability of winning a tackle increases and referee could tend to give more cards to players winning more tackles</li>
+</ol>
+<p>Our idea is the following:
+We apply <code>test_data</code> like before, but drop the skin colour rating and shuffle the variables "position" and "weight".
+Additionally, we check the correlation between skin color and the new variables.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Defense-hypothesis">Defense hypothesis<a class="anchor-link" href="#Defense-hypothesis">&#182;</a></h3>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[23]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pos_data</span> <span class="o">=</span> <span class="n">prediction_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">pos_data</span><span class="p">[</span><span class="s2">&quot;is_defense&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">pos_data</span><span class="p">[</span><span class="s2">&quot;position&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">([</span><span class="s2">&quot;Center Back&quot;</span><span class="p">,</span> <span class="s2">&quot;Left Fullback&quot;</span><span class="p">,</span> <span class="s2">&quot;Right Fullback&quot;</span><span class="p">])</span>
+<span class="n">pos_data_pred</span> <span class="o">=</span> <span class="n">pos_data</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;rating&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">n_larger_linear</span><span class="p">,</span> <span class="n">n_larger_regtree</span> <span class="o">=</span> <span class="n">test_data</span><span class="p">(</span><span class="n">pos_data_pred</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="s2">&quot;is_defense&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of greater test errors with shuffled data and linear model: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_larger_linear</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of greater test errors with shuffled data and regression tree model: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_larger_regtree</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>Run shuffleset no 1
+Run shuffleset no 2
+Run shuffleset no 3
+Run shuffleset no 4
+Run shuffleset no 5
+Run shuffleset no 6
+Run shuffleset no 7
+Run shuffleset no 8
+Run shuffleset no 9
+Run shuffleset no 10
+Run shuffleset no 11
+Run shuffleset no 12
+Run shuffleset no 13
+Run shuffleset no 14
+Run shuffleset no 15
+Run shuffleset no 16
+Run shuffleset no 17
+Run shuffleset no 18
+Run shuffleset no 19
+Number of greater test errors with shuffled data and linear model: 19
+Number of greater test errors with shuffled data and regression tree model: 0
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>There is no clear statement to be made here whether defense players are more likely to get red cards.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[24]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">bins</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="mf">0.125</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span> <span class="o">+</span> <span class="o">.</span><span class="mi">125</span><span class="p">,</span> <span class="mf">0.125</span><span class="p">)</span>
+
+<span class="n">pos_data</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="s2">&quot;rating&quot;</span><span class="p">,</span> <span class="s2">&quot;is_defense&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Skin Colour Rating&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The correlation between rating and defense is: </span><span class="si">{</span><span class="n">pos_data</span><span class="o">.</span><span class="n">rating</span><span class="o">.</span><span class="n">corr</span><span class="p">(</span><span class="n">pos_data</span><span class="o">.</span><span class="n">is_defense</span><span class="p">)</span><span class="si">:</span><span class="s2">1.4f</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>The correlation between rating and defense is: -0.0026
+</pre>
+</div>
+</div>
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div class="jp-RenderedImage jp-OutputArea-output ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>Additionally, the correlation between skin colour and playing in defense is negligible, as can be seen in the box plot.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Weight-hypothesis">Weight hypothesis<a class="anchor-link" href="#Weight-hypothesis">&#182;</a></h3>
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We hypthesise that heavy players are more likely to get red cards.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[25]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">weight_data</span> <span class="o">=</span> <span class="n">prediction_data</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">weight_data_pred</span> <span class="o">=</span> <span class="n">pos_data</span><span class="o">.</span><span class="n">drop</span><span class="p">([</span><span class="s2">&quot;rating&quot;</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">n_larger_linear</span><span class="p">,</span> <span class="n">n_larger_regtree</span> <span class="o">=</span> <span class="n">test_data</span><span class="p">(</span><span class="n">prediction_data</span><span class="p">,</span> <span class="mi">19</span><span class="p">,</span> <span class="s2">&quot;weight&quot;</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of greater test errors with shuffled data and linear model: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_larger_linear</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Number of greater test errors with shuffled data and regression tree model: </span><span class="si">%i</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">n_larger_regtree</span><span class="p">)</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+<div class="jp-RenderedText jp-OutputArea-output" data-mime-type="text/plain">
+<pre>Run shuffleset no 1
+Run shuffleset no 2
+Run shuffleset no 3
+Run shuffleset no 4
+Run shuffleset no 5
+Run shuffleset no 6
+Run shuffleset no 7
+Run shuffleset no 8
+Run shuffleset no 9
+Run shuffleset no 10
+Run shuffleset no 11
+Run shuffleset no 12
+Run shuffleset no 13
+Run shuffleset no 14
+Run shuffleset no 15
+Run shuffleset no 16
+Run shuffleset no 17
+Run shuffleset no 18
+Run shuffleset no 19
+Number of greater test errors with shuffled data and linear model: 15
+Number of greater test errors with shuffled data and regression tree model: 2
+</pre>
+</div>
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>This hypothesis cannot be confirmed with high probability.</p>
+
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell   ">
+<div class="jp-Cell-inputWrapper">
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In&nbsp;[26]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+     <div class="CodeMirror cm-s-jupyter">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">pos_data</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">,</span> <span class="s2">&quot;rating&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;weight&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+</pre></div>
+
+     </div>
+</div>
+</div>
+</div>
+
+<div class="jp-Cell-outputWrapper">
+
+
+<div class="jp-OutputArea jp-Cell-outputArea">
+
+<div class="jp-OutputArea-child">
+
+    
+    <div class="jp-OutputPrompt jp-OutputArea-prompt"></div>
+
+
+
+
+<div class="jp-RenderedImage jp-OutputArea-output ">
+<img src="data:image/png;base64,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
+"
+>
+</div>
+
+</div>
+
+</div>
+
+</div>
+
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>There is no relation between the rating and the weight.</p>
+
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<h3 id="Summary">Summary<a class="anchor-link" href="#Summary">&#182;</a></h3>
+</div>
+</div>
+<div class="jp-Cell-inputWrapper"><div class="jp-InputPrompt jp-InputArea-prompt">
+</div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput " data-mime-type="text/markdown">
+<p>We see that both our alternative hypotheses cannot be supported by the data.</p>
 
 </div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs  ">
