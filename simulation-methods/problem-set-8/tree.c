@@ -56,7 +56,7 @@ typedef struct node {
 static node     *tree;
 static particle *star;
 
-// ========================== Internal functions git ==============================
+// ========================== Internal functions ==============================
 
 /**
  * get_empty_node() - Return pointer to an empty tree node.
@@ -124,8 +124,8 @@ void insert_particle(node *current, particle *pnew)
 	int n, p_subnode, pnew_subnode;
 
 	if (current->p) {
-		/* The node contains a particle already. 
-		   Need to create a new set of 8 subnodes, and then move this particle to one of them */
+		/* The node contains a particle already. Need to create a new set
+		   of 8 subnodes, and then move this particle to one of them */
 		n = 0;
 		for (int i = 0; i < 2; i++) {
 			for (int j = 0; j < 2; j++) {
@@ -138,9 +138,9 @@ void insert_particle(node *current, particle *pnew)
 					
 					// Set length and geometric center of child node.
 					child->len = 0.5 * current->len;
-					child->center[0] = current->center[0] + 0.25 * (2*i-1) * current->len;
-					child->center[1] = current->center[1] + 0.25 * (2*j-1) * current->len;
-					child->center[2] = current->center[2] + 0.25 * (2*k-1) * current->len;
+					child->center[0] = current->center[0] + 0.25*(2*i-1)*current->len;
+					child->center[1] = current->center[1] + 0.25*(2*j-1)*current->len;
+					child->center[2] = current->center[2] + 0.25*(2*k-1)*current->len;
 				}
 			}
 		}
@@ -164,8 +164,9 @@ void insert_particle(node *current, particle *pnew)
 		   Check in which subnode the new particle would fall in. */
 		pnew_subnode = get_subnode_index(current, pnew);
 
-		/* If the corresponding subnode exists, we try to insert the particle there,
-		   otherwise we know there are no subnodes in the node, so we can put the particle into the current node */
+		/* If the corresponding subnode exists, we try to insert the 
+		   particle there, otherwise we know there are no subnodes in the
+		   node, so we can put the particle into the current node */
 		if (current->children[pnew_subnode]) {
 			insert_particle(current->children[pnew_subnode], pnew);
 		} else {
@@ -260,7 +261,8 @@ void calc_multipole_moments(node *current)
 					drdr[i] += child->qm[i]; 
 				}
 				
-				// Add total quad-contribution to the current node.
+				/* Add total contribution to the quad-moment of 
+				   the current node. */
 				for (int i = 0; i < 9; i++) {
 					current->qm[i] += drdr[i]; 	
 				}
@@ -272,17 +274,20 @@ void calc_multipole_moments(node *current)
 	
 		/* Do we at least have a particle? */
 		if (current->p) {
-			/* Yes, so let's copy this particle to the multipole moments of the node. */
+			/* Yes, so let's copy this particle to the multipole 
+			   moments of the node. */
 			current->mass = current->p->mass;
 			for (int j = 0; j < 3; j++) {
 				current->cm[j] = current->p->pos[j];
 			}
-			// Quadrupole moments in node with a single particle are always zero.
+			/* Quadrupole moments in node with a single particle are 
+			   always zero. */
 			for (int i = 0; i < 9; i++) {
 				current->qm[i] = 0; 
 			}	
 		} else {
-			/* Nothing in here at all; let's initialize the multipole moments to zero. */
+			/* Nothing in here at all; let's initialize the multipole
+			   moments to zero. */
 			current->mass  = 0;
 			for (int j = 0; j < 3; j++) {
 				current->cm[j] = 0;
@@ -338,14 +343,15 @@ void walk_tree(node *current, double pos[3], double acc[3])
 	double yQy, yQ[3];
 	double *Q; 
 
-	/* Only do something if there is mass in this branch of the tree (i.e. if it is not empty). */
+	/* Only do something if there is mass in this branch of the tree 
+	   (i.e. if it is not empty). */
 	if(current->mass) {
 		
 		theta = get_opening_angle(current, pos);
 
-		/* If the node is seen under a small enough angle or contains a single particle,
-		 * we take its multipole expansion, and we're done for this branch.
-		 * NOTE: Avoid self-attraction of a particle. */
+		/* If the node is seen under a small enough angle or contains a 
+		 * single particle, we take its multipole expansion, and we're 
+		 * done for this branch. NOTE: Avoid self-attraction of a particle. */
 		if (theta < opening_threshold || current->p) {
 			
 			/* Vector y from CM of node to the reference position. */
@@ -354,15 +360,18 @@ void walk_tree(node *current, double pos[3], double acc[3])
 				y[j] = pos[j] - current->cm[j]; 
 				y2 += y[j] * y[j]; 
 			}
-			y1 = sqrt(y2);
 			
 			/* Ensure no self-interaction, ie distance to the reference 
 			   point from the node CM is small (~0). */
-			if (y1 > 10e-10) {
+			if (y2 > 10e-20) {
 				// Increment particle-node interaction counter.
 				node_counter++; 
 				
-				// Get |y|^3 and total mass of node.
+				// Include the Plummer softening parameter.
+				y2 += eps*eps; 
+				
+				// Get |y|^3 and the total mass of node.	
+				y1 = sqrt(y2);
 				y3 = y1 * y2; 
 				M = current->mass;
 				
@@ -374,7 +383,9 @@ void walk_tree(node *current, double pos[3], double acc[3])
 				/* If user has chosen so, also calculate acceleration
 				   using quad-moments. */
 				if (quadrupoles) {
-					y5 = y3 * y2; 
+					// Get |y|^5
+					y5 = y3 * y2;
+					 
 					// Pointer to node's quadrupole moment. 
 					Q = current->qm; 
 					
@@ -402,7 +413,8 @@ void walk_tree(node *current, double pos[3], double acc[3])
 				}
 			}
 		} else {
-			/* Otherwise we have to open the node and look at all children nodes in turn */
+			/* Otherwise we have to open the node and look at all 
+			   children nodes in turn */
 
 			/* Make sure that we actually have subnodes. */
 			if (current->children[0]) {             
@@ -419,14 +431,14 @@ int main(int argc, char **argv)
 	int opt;
 	bool use_default_N = true; 
 	bool use_default_t = true;
+	bool machine_table = false;
 	
 	// Parse all arguments.	
-	while((opt = getopt(argc, argv, "n:t:q")) != -1) {  
+	while((opt = getopt(argc, argv, "n:t:qm")) != -1) {  
 		switch(opt) {  
             		case 'n':
             			/* Interpret the number of particles to use. */
             			N = atoi(optarg);  
-                		  
                 		use_default_N = false; 
 				break;
 			case 't': 
@@ -435,32 +447,43 @@ int main(int argc, char **argv)
 				use_default_t = false;
 				break; 			
 			case 'q': 
-				/* Toggle acceleration calculation using quadrupole moments. */ 
+				/* Toggle calculation of acceleration using 
+				   quadrupole moments. */ 
 				quadrupoles = true; 
 				break;
+			case 'm':
+				// Print machine-readable table of data.
+				machine_table = true;
+				break; 
         	}  
     	}
     	if (use_default_N && use_default_t && !quadrupoles) {
     		fprintf(stderr, "Usage:\n\t [-n] N [-t] theta [-q]\n"
     			"\t where N is an integer, giving the numer of particles, \n"
     			"\t and theta is the opening angle threshold. \n"
-    			"\t Use -q to estimate acceleration up to quadrupole moments.\n\n"); 
+    			"\t Use -q to estimate acceleration up to quadrupole moments.\n"
+    			"\t Use -m to output machine-readable table.\n\n"); 
     		return 1;
     	} 
-    	if (quadrupoles) {
-    		fprintf(stderr, "Using monopole & quadrupole moments.\n\n");	
-    	} else {
-    		fprintf(stderr, "Using only monopole moments.\n\n");	
-    	}
-    	if (use_default_N) {
-    		fprintf(stderr, "Using default size:        N     = %-d\n", N); 
-    	} else {
-    		fprintf(stderr, "Number of particles:       N     = %-d\n", N);
-    	}
-    	if (use_default_t) {
-    		fprintf(stderr, "Using default threshold:   theta = %-.2f\n", opening_threshold);
-    	} else {
-    		fprintf(stderr, "Opening angle threshold:   theta = %-.4f\n", opening_threshold); 
+	    	
+	if (machine_table) {
+		printf("%d, %4.4f, %d, ", N, opening_threshold, quadrupoles);
+	} else {
+	    	if (quadrupoles) {
+	    		fprintf(stderr, "Using monopole & quadrupole moments.\n\n");	
+	    	} else {
+	    		fprintf(stderr, "Using only monopole moments.\n\n");	
+	    	}
+	    	if (use_default_N) {
+	    		fprintf(stderr, "Using default size:        N     = %-d\n", N); 
+	    	} else {
+	    		fprintf(stderr, "Number of particles:       N     = %-d\n", N);
+	    	}
+	    	if (use_default_t) {
+	    		fprintf(stderr, "Using default threshold:   theta = %-.2f\n", opening_threshold);
+	    	} else {
+	    		fprintf(stderr, "Opening angle threshold:   theta = %-.4f\n", opening_threshold); 
+	    	}
     	}
     	
 	MAX_NODES = 5*N;	// Max no. of nodes in tree.
@@ -514,10 +537,14 @@ int main(int argc, char **argv)
 
 	/* Stop the timer. */
 	t1 = (double) clock();
-	printf("\nForce calculation with tree:         %-9g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
-	 
+	if (machine_table) {
+		printf("%9g, ", (t1 - t0) / CLOCKS_PER_SEC);
+	} else {
+		printf("\nForce calculation with tree:         %-9g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
+	}
+
 	double dx[3], dx2, m;
-	double eps2 = eps * eps;  
+	double eps2 = eps*eps;  
 
 	/* Start the timer. */
 	t0 = (double) clock();
@@ -551,8 +578,11 @@ int main(int argc, char **argv)
 	
 	/* Stop the timer. */
 	t1 = (double) clock();
-	printf("Calculation with direct summation:   %-9g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
-
+	if (machine_table) {
+		printf("%9g, ", (t1 - t0) / CLOCKS_PER_SEC);
+	} else {
+		printf("Calculation with direct summation:   %-9g sec\n", (t1 - t0) / CLOCKS_PER_SEC);
+	}
 	double err_sum = 0;
 	double diff[3], diff2, dir_acc, tree_acc, direct2;  
 	
@@ -573,9 +603,13 @@ int main(int argc, char **argv)
 	}
 	err_sum /= N;
 
-	printf("\nAverage relative error:  		 	   %-8g\n", err_sum);
+	if (machine_table) {
+		printf("%12g, %9g\n", err_sum, (double) node_counter/N);
+	} else {
+		printf("\nAverage relative error:  		 	   %-9g\n", err_sum);
+		printf("Average particle-node interactions per particle:   %-9g\n", (double) node_counter/N);
+	}
 	
-	printf("Average particle-node interactions per particle:   %-8g\n", (double) node_counter/N);
 	free(tree);
 	free(star);
 
