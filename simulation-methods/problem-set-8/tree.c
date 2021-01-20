@@ -180,7 +180,7 @@ void insert_particle(node *current, particle *pnew)
  * @current: Pointer to the node in question.
  *
  * Recursively calculates the moments of the multipole expansion of the current
- * node. (Only monopole moments in this case.)
+ * node. Calculates monopole (and optionally quadrupole) moments for each node. 
  *
  * Returns: Nothing.
  */ 
@@ -447,8 +447,7 @@ int main(int argc, char **argv)
 				use_default_t = false;
 				break; 			
 			case 'q': 
-				/* Toggle calculation of acceleration using 
-				   quadrupole moments. */ 
+				/* Toggle usage of quadrupole moments. */ 
 				quadrupoles = true; 
 				break;
 			case 'm':
@@ -489,11 +488,11 @@ int main(int argc, char **argv)
 	MAX_NODES = 5*N;	// Max no. of nodes in tree.
 	
 	/* Dynamically allocate arrays for the tree structure. */
-	tree = calloc(MAX_NODES, sizeof(node));	// Array of tree nodes.
+	tree = calloc(MAX_NODES, sizeof(node));   	// Array of tree nodes.
 	star = calloc(N, sizeof(particle));		// Array of particles.
 	
-	double t0, t1;			// Start/stop times.
-	srand48(42);			// Set a random number seed
+	double t0, t1;		// Start/stop times.
+	srand48(42);		// Set a random number seed
 
 	/* Create a random particle set, uniformly distributed in a box of unit 
 	   sidelength. Total mass of the N particles is unity. */
