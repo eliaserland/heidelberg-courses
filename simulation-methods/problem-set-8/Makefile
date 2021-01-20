@@ -29,4 +29,4 @@ tree: tree.c $(SRC)
 
 # Test for memory leaks
 memtest: tree
-	valgrind --leak-check=full --show-reachable=yes ./$<
+	valgrind --leak-check=full --show-reachable=yes ./$< -q
