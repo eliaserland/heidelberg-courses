@@ -213,15 +213,15 @@ setup the ICs and run
 
 numpy.random.seed(541) #seed for random number genereation
 
-N     =       1600#number of particles
-h     =       0.1#kernel size
-gamma =       2#polytropic index
-K     =       0.1#pressure constant: P=K rho**gamma
-mp    =       0.0025#particle mass
-G     =       0.1#rescaled gravitational constant
-nu    =       0.#damping coefficient
-eps   =       h/100#softening length
-CFL   =       0.8#CFL factor for getting sonic time step
+N     =       800      #number of particles
+h     =       0.1      #kernel size
+gamma =       2        #polytropic index
+K     =       0.1      #pressure constant: P=K rho**gamma
+mp    =       0.0025   #particle mass
+G     =       0.1      #rescaled gravitational constant
+nu    =       0.       #damping coefficient
+eps   =       h/100    #softening length
+CFL   =       0.8      #CFL factor for getting sonic time step
 
 
 pars = numpy.array((N,h,gamma,K,mp,G,nu,eps,CFL)) #define array with parameters
