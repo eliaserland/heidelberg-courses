@@ -1,0 +1,41 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                     Feedback to Exercise 05                                      │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+                Handed in as: Catherine-Knobloch_Elias-Olofsson_Julia-Siegl_ex05.zip                
+                                                                                                    
+                            Great, thanks for naming the file correctly.                            
+                                                                                                    
+                          This feedback is for:                                                     
+                          • Catherine Knobloch (cknobloch1998@gmail.com)                            
+                          • Elias Olofsson (ub253@stud.uni-heidelberg.de)                           
+                          • Julia Siegl (Siegl@stud.uni-heidelberg.de)                              
+                                                 
+                                                  
+                           E 1 (25.0) │ E 2 (6.0) │ E 3 (9.0) │ ∑ (40.0)                            
+                           ───────────┼───────────┼───────────┼─────────                            
+                              25.0    │    5.0    │    9.0    │   39.0                              
+                                                 
+                                                  
+Exercise  1                                                                            [25.0 / 25.0]
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Where is the version indicator? :O                                                                  
+Otherwise, well done.                                                                               
+                                                                                                    
+                                                                                                    
+Exercise  2                                                                              [5.0 / 6.0]
+────────────────────────────────────────────────────────────────────────────────────────────────────
+[@-1] There seems to be an error in the centering.                                                  
+I am not sure where the error is. If you want me to investigate, don't hesitate to contact me.      
+But I would only like to spend the effort if you are interested.                                    
+                                                                                                    
+                                                                                                    
+Exercise  3                                                                              [9.0 / 9.0]
+────────────────────────────────────────────────────────────────────────────────────────────────────
+In principle correct. You noted that the approach of increasing the angles would have been more     
+useful.                                                                                             
+
+                                                                                                   
+════════════════════════════════════════════════════════════════════════════════════════════════════
+This feedback was created by Felix (Felix Draxler).                                                 
+Please ask questions about the feedback to (felix.draxler@iwr.uni-heidelberg.de)                    
+or on Discord via the private chat.                                                                 
