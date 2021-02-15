@@ -213,13 +213,13 @@ setup the ICs and run
 
 numpy.random.seed(541) #seed for random number genereation
 
-N     =       800      #number of particles
+N     =       1600     #number of particles
 h     =       0.1      #kernel size
 gamma =       2        #polytropic index
 K     =       0.1      #pressure constant: P=K rho**gamma
 mp    =       0.0025   #particle mass
 G     =       0.1      #rescaled gravitational constant
-nu    =       0.       #damping coefficient
+nu    =       0        #damping coefficient
 eps   =       h/100    #softening length
 CFL   =       0.8      #CFL factor for getting sonic time step
 
@@ -242,8 +242,12 @@ P     = numpy.zeros((N))
 
 #------------------------#
 #setting initial conditions
+'''
+x[:] = numpy.random.normal(size=(3,N))
+v[:] = 0
+'''
 
-data = numpy.load('numpy.npz')
+data = numpy.load('output_task1.npz')
 
 x[0,:N//2] = data['x'][0]
 x[1,:N//2] = data['x'][1]
@@ -262,13 +266,12 @@ v[1,N//2:] = data['v'][1]
 v[2,N//2:] = data['v'][2]
 
 
-
-
 #set the masses
 m[:] = mp
 
 #------------------------#
 #setup figure object with axis
+plt.figure(figsize=(6,6))
 grid = plt.GridSpec(1, 1, wspace=0.0, hspace=0.3)
 ax1  = plt.subplot(grid[0])
 
@@ -284,24 +287,39 @@ dt,E0=get_acceleration(x,v,m,rho,P,a,pars)
 t    = 0.0    #initial time
 tmax = 30.    #maximum time
 z=0
+E_list = []; t_list = []
+E_list.append(E0/E0)
+t_list.append(t)
+
 while(t<tmax):
-
-
+    '''
+    if t > 100. and t <= 170.:
+        pars[i_nu] = 0.
+    if t > 170.:
+        pars[i_nu] = 1.
+    '''
     t+=dt #update time
     dt,E=leapfrog(x,v,m,rho,P,a,dt,pars) #leapfrog step and next time step estimate
 
     #plotting instructions:
     plt.sca(ax1)
     plt.cla()
-    plt.scatter(x[0,:],x[1,:],color='blue',s=10, alpha=0.5)
-    ax1.set(xlim=(-3,3), ylim=(-3,3))
+    plt.scatter(x[0,:N//2],x[1,:N//2],color='blue',s=10, alpha=0.5)
+    plt.scatter(x[0,N//2:],x[1,N//2:],color='red',s=10, alpha=0.5)
+    ax1.set(xlim=(-3.5,3.5), ylim=(-3.5,3.5))
     ax1.set_aspect('equal', 'box')
     ax1.set_title('t=%.3f   '%(t)+r'$\frac{E}{E_0}=%.5f$'%(E/E0))
     ax1.set_xlabel('x')
     ax1.set_ylabel('y')
     plt.pause(0.001)
-    plt.savefig('numba_%d.png'%(z))
+    #plt.savefig('img_twoplanets/numba_%d.png'%(z), dpi=600)
+    plt.savefig('img_twoplanets/numba_%d.png'%(z))
     z+=1
 
+    # Save energy for the current time step
+    E_list.append(E/E0)
+    t_list.append(t)
 
+numpy.savez('output.npz', x=x, v=v)
+numpy.savez('energy.npz', E=numpy.array(E_list), t=numpy.array(t_list))
 #------------------------#
