@@ -1,0 +1,41 @@
+┌──────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                     Feedback to Exercise 08                                      │
+└──────────────────────────────────────────────────────────────────────────────────────────────────┘
+                Handed in as: catherine-knobloch_elias-olofsson_julia-siegl_ex08.zip                
+                                                                                                    
+                            Great, thanks for naming the file correctly.                            
+                                                                                                    
+                          This feedback is for:                                                     
+                          • Catherine Knobloch (cknobloch1998@gmail.com)                            
+                          • Elias Olofsson (ub253@stud.uni-heidelberg.de)                           
+                          • Julia Siegl (Siegl@stud.uni-heidelberg.de)                              
+                                                 
+                                                  
+                                 E 1 (14.0) │ E 2 (12.0) │ ∑ (26.0)                                 
+                                 ───────────┼────────────┼─────────                                 
+                                    15.0    │    12.0    │   27.0                                   
+                                                 
+                                                  
+Exercise  1                                                                            [15.0 / 14.0]
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Somehow, the SVG figures don't show up in Jupyter Lab (which I use for correction).                 
+                                                                                                    
+2.1                                                                                                 
+[@+1] Your code is really nice to read and solves the exercise very well.                           
+                                                                                                    
+2.2                                                                                                 
+We clip the entire matrices, but your code is closer to the exercise.                               
+                                                                                                    
+                                                                                                    
+Exercise  2                                                                            [12.0 / 12.0]
+────────────────────────────────────────────────────────────────────────────────────────────────────
+Comment on your comment: NMF is equivariant under user reordering; there is no loss taking the      
+order of feature vectors (i.e. the order of users in the movie ratings table) into account.         
+                                                                                                    
+As always: Very well executed, commented and visualised!                                            
+
+                                                                                                   
+════════════════════════════════════════════════════════════════════════════════════════════════════
+This feedback was created by Felix (Felix Draxler).                                                 
+Please ask questions about the feedback to (felix.draxler@iwr.uni-heidelberg.de)                    
+or on Discord via the private chat.                                                                 
