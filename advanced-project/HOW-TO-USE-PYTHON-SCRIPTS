@@ -1,0 +1,12 @@
+All this python files can be used in the following way:
+1 - Copy the files to your relaxation-runs or ce-runs folder
+2 - edit models.py:
+    Select your desired models to be plotted.
+    If you're using plot_slices_parallel, specify the max number of cores you can afford to use
+3 - run it with  python3 check_snapshots.py or python3 plot_slices.py etc
+
+Notes:
+plot_slices works for either relaxation or ce runs, it well, plots slices.
+
+check_snapshots is thought for use in relaxation runs only. But still, some functions written there are imported to plot_slices, so if you want to use plot_slices, you need check_snapshots as well
+
